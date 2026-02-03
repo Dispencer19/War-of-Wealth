@@ -617,9 +617,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc202d61355fa4dddb87c742645d6165, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCam
-  sensX: 0
-  sensY: 0
-  orientation: {fileID: 0}
+  sensX: 400
+  sensY: 400
+  orientation: {fileID: 420246856}
 --- !u!1 &1182800147
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,7 +727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b17f8b0ea15647b7b82dd4ef4c33014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  cameraPosition: {fileID: 0}
+  cameraPosition: {fileID: 683838862}
 --- !u!114 &1182800152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -785,7 +785,7 @@ GameObject:
   - component: {fileID: 1640342293}
   m_Layer: 0
   m_Name: PlayerObj
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
