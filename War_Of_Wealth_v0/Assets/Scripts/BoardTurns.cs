@@ -15,7 +15,7 @@ public class BoardTurns : MonoBehaviour
 
     [SerializeField] int numTotalLocations = 40;
     [Tooltip("Total number of squares on the monopoly board")]
-    [SerializeField] int numRowLocations = 40;
+    [SerializeField] int numRowLocations = 10;
     [Tooltip("Number squares per row on the board")]
 
     [SerializeField] BoardVariables boardVariables;
@@ -38,7 +38,7 @@ public class BoardTurns : MonoBehaviour
             //                                                                               idk if it should be modded by this yet i didnt think a lot
             playerLocations[currPlayer] = (playerLocations[currPlayer] + Random.Range(1, 7)) % numRowLocations;
             //                                                 will make a function that returns a location (a transform) based on which player & which square
-            playerGameObjects[currPlayer].transform.position = boardVariables.Location(currPlayer, playerLocations[currPlayer]);
+            playerGameObjects[currPlayer].transform.position = boardVariables.Location(currPlayer, playerLocations[currPlayer], numRowLocations);
 
 
             currPlayer = (currPlayer + 1) % numTotalPlayers;
