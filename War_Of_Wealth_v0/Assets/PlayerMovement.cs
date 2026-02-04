@@ -1,22 +1,25 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Movemoent")]
-    public float moveSpeed;
-    public float groundDrag;
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed = 6f;
+    [SerializeField] private float groundDrag = 5f;
+
     [Header("Ground Check")]
-    public float playerHeight;
-    public LayerMask whatIsGround;
-    bool grounded;
+    [SerializeField] private float playerHeight = 2f;
+    [SerializeField] private LayerMask whatIsGround;
+    private bool grounded;
 
-    public Transform orientation;
-    float horizontalInput;
-    float verticalInput;
+    [Header("References")]
+    [SerializeField] private Transform orientation;
 
-    Vector3 moveDirection;
+    private float horizontalInput;
+    private float verticalInput;
 
-    Rigidbody rb;
+    private Vector3 moveDirection;
+    private Rigidbody rb;
 
     private void Start()
     {
@@ -24,26 +27,48 @@ public class PlayerMovement : MonoBehaviour
         rb.freezeRotation = true;
     }
 
-    private void Update(){
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
-        MyInput();
-        if (grounded)
-            rb.linearDamping = groundDrag;
-        else
-            rb.linearDamping = 0;
+    private void Update()
+    {
+        // Ground check
+        grounded = Physics.Raycast(
+            transform.position,
+            Vector3.down,
+            playerHeight * 0.5f + 0.2f,
+            whatIsGround
+        );
+
+        ReadInput();
+        ControlDrag();
     }
-    
-    private void FixedUpdate(){
+
+    private void FixedUpdate()
+    {
         MovePlayer();
     }
 
-    private void MyInput(){
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+    private void ReadInput()
+    {
+        if (Keyboard.current == null) return;
+
+        horizontalInput =
+            (Keyboard.current.dKey.isPressed ? 1 : 0) -
+            (Keyboard.current.aKey.isPressed ? 1 : 0);
+
+        verticalInput =
+            (Keyboard.current.wKey.isPressed ? 1 : 0) -
+            (Keyboard.current.sKey.isPressed ? 1 : 0);
     }
 
-    private void MovePlayer(){
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+    private void MovePlayer()
+    {
+        moveDirection = orientation.forward * verticalInput
+                      + orientation.right * horizontalInput;
 
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+    }
+
+    private void ControlDrag()
+    {
+        rb.linearDamping = grounded ? groundDrag : 0f;
     }
 }
