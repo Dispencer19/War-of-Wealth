@@ -7,6 +7,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 6f;
     [SerializeField] private float groundDrag = 5f;
 
+    [Header("Jumping")]
+    [SerializeField] private float jumpForce = 7f;
+    [SerializeField] private float jumpCooldown = 0.25f;
+    [SerializeField] private float airMultiplier = 0.4f;
+    private bool readyToJump = true;
+
     [Header("Ground Check")]
     [SerializeField] private float playerHeight = 2f;
     [SerializeField] private LayerMask whatIsGround;
@@ -39,6 +45,14 @@ public class PlayerMovement : MonoBehaviour
 
         ReadInput();
         ControlDrag();
+
+        // Jump input (Space)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
+        {
+            readyToJump = false;
+            Jump();
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
     }
 
     private void FixedUpdate()
@@ -64,7 +78,27 @@ public class PlayerMovement : MonoBehaviour
         moveDirection = orientation.forward * verticalInput
                       + orientation.right * horizontalInput;
 
-        rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        if (grounded)
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        }
+        else
+        {
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+        }
+    }
+
+    private void Jump()
+    {
+        // Reset Y velocity so jumps feel consistent
+        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private void ResetJump()
+    {
+        readyToJump = true;
     }
 
     private void ControlDrag()
