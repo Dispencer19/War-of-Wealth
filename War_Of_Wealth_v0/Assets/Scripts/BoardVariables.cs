@@ -27,7 +27,8 @@ public class BoardVariables : MonoBehaviour
     {
         // row 0-3 of the board. 0 is first row
         row = currLocation / numRowLocations;
-        
+        Vector3 myPosition = new Vector3(positionX, positionY, positionZ);
+
         // row 0 do nothing. else, rotate vector
         if(row == 1)
         {
@@ -44,8 +45,7 @@ public class BoardVariables : MonoBehaviour
 
         }
 
-        Vector3 myPosition = new Vector3(positionX, positionY, positionZ);
-
+        
         return myPosition;
     }
 
