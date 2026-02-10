@@ -34,26 +34,35 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void Update()
+{
+    // Respawn check
+    if (transform.position.y <= -50f)
     {
-        // Ground check
-        grounded = Physics.Raycast(
-            transform.position,
-            Vector3.down,
-            playerHeight * 0.5f + 0.2f,
-            whatIsGround
-        );
-
-        ReadInput();
-        ControlDrag();
-
-        // Jump input (Space)
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
-        {
-            readyToJump = false;
-            Jump();
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        transform.position = Vector3.zero;
     }
+
+    // Ground check
+    grounded = Physics.Raycast(
+        transform.position,
+        Vector3.down,
+        playerHeight * 0.5f + 0.2f,
+        whatIsGround
+    );
+
+    ReadInput();
+    ControlDrag();
+
+    // Jump input (Space)
+    if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
+    {
+        readyToJump = false;
+        Jump();
+        Invoke(nameof(ResetJump), jumpCooldown);
+    }
+}
+
 
     private void FixedUpdate()
     {
