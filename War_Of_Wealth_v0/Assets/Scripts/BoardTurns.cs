@@ -10,7 +10,6 @@ public class BoardTurns : MonoBehaviour
     // * gonna move a lot of variables into BoardVariables later
 
     int currPlayer = 0; // rotates thru 0 to 3
-    int diceroll = -1;
     [SerializeField] public static int numTotalPlayers = 4;
     int[] playerLocations = new int[numTotalPlayers]; // they all start on square 0
 

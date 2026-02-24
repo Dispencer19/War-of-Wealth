@@ -10,18 +10,14 @@ public class BoardVariables : MonoBehaviour
     //  - Z IS VERTICAL
     //  - START IS IN THE BOTTOM LEFT CORNER
 
-    [SerializeField] float distBetweenSquares = 6f;
+    [SerializeField] float distBetweenSquares = 7f;
     [Tooltip("How far a piece will travel on the board per square")]
-    [SerializeField] float distBetweenPlayers = 1.8f;
+    [SerializeField] float distBetweenPlayers = 1.1f;
 
-    [SerializeField] float offsetPositionX = 0.0f;
-    [Tooltip("If the corner of the board is not at (0,0,0), add offset for where pieces should start on the board")]
-    [SerializeField] float offsetPositionY = 0.0f;
-    [Tooltip("If the corner of the board is not at (0,0,0), add offset for where pieces should start on the board")]
-    [SerializeField] float offsetPositionZ = 0.0f;
-    [Tooltip("If the corner of the board is not at (0,0,0), add offset for where pieces should start on the board")]
+    float offsetPositionX = 0.0f;
+    float offsetPositionY = 0.0f;
+    float offsetPositionZ = 0.0f;
 
-    float[] offsetsPlayer = new float[4];
     int row = -1;
     float positionY = 0.0f;
     float positionX = 0.0f;
