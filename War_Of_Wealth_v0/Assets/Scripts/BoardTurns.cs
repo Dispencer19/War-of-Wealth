@@ -29,8 +29,6 @@ public class BoardTurns : MonoBehaviour
     {
         boardVariables = GetComponent<BoardVariables>();
         cooldown = GetComponent<Cooldown>();
-        disableFPS = GetComponent<DisableFPS>();
-        disableFPS.DisableFPSObjects();
     }
 
     public void BoardTurnButton()

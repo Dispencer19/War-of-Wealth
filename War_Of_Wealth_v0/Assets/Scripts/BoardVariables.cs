@@ -14,9 +14,9 @@ public class BoardVariables : MonoBehaviour
     [Tooltip("How far a piece will travel on the board per square")]
     [SerializeField] float distBetweenPlayers = 1.1f;
 
-    float offsetPositionX = 0.0f;
-    float offsetPositionY = 0.0f;
-    float offsetPositionZ = 0.0f;
+    [SerializeField] float offsetPositionX = 29.6f;
+    [SerializeField] float offsetPositionY = 2.97f;
+    [SerializeField] float offsetPositionZ = -21.32f;
 
     int row = -1;
     float positionY = 0.0f;

@@ -132,7 +132,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Crouch"",
                     ""type"": ""Button"",
                     ""id"": ""27c5f898-bc57-4ee1-8800-db469aca5fe3"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -159,7 +159,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Next"",
                     ""type"": ""Button"",
                     ""id"": ""b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -186,6 +186,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""Reload"",
                     ""type"": ""Button"",
                     ""id"": ""ea00f61f-da25-4c35-8ec2-6f5ff930a267"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SwitchGameMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""331bf1cf-efd5-4935-b35d-ca99f7b82fb8"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -608,6 +617,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Reload"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5b55e32f-bc81-4419-be56-e9a2669cae6a"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SwitchGameMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1206,6 +1226,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
+        m_Player_SwitchGameMode = m_Player.FindAction("SwitchGameMode", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1310,6 +1331,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_Reload;
+    private readonly InputAction m_Player_SwitchGameMode;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1365,6 +1387,10 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Reload".
         /// </summary>
         public InputAction @Reload => m_Wrapper.m_Player_Reload;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/SwitchGameMode".
+        /// </summary>
+        public InputAction @SwitchGameMode => m_Wrapper.m_Player_SwitchGameMode;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1424,6 +1450,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Reload.started += instance.OnReload;
             @Reload.performed += instance.OnReload;
             @Reload.canceled += instance.OnReload;
+            @SwitchGameMode.started += instance.OnSwitchGameMode;
+            @SwitchGameMode.performed += instance.OnSwitchGameMode;
+            @SwitchGameMode.canceled += instance.OnSwitchGameMode;
         }
 
         /// <summary>
@@ -1468,6 +1497,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Reload.started -= instance.OnReload;
             @Reload.performed -= instance.OnReload;
             @Reload.canceled -= instance.OnReload;
+            @SwitchGameMode.started -= instance.OnSwitchGameMode;
+            @SwitchGameMode.performed -= instance.OnSwitchGameMode;
+            @SwitchGameMode.canceled -= instance.OnSwitchGameMode;
         }
 
         /// <summary>
@@ -1845,6 +1877,13 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnReload(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "SwitchGameMode" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSwitchGameMode(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

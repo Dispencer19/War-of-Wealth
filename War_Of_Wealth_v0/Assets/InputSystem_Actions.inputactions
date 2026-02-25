@@ -46,7 +46,7 @@
                     "name": "Crouch",
                     "type": "Button",
                     "id": "27c5f898-bc57-4ee1-8800-db469aca5fe3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -73,7 +73,7 @@
                     "name": "Next",
                     "type": "Button",
                     "id": "b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -100,6 +100,15 @@
                     "name": "Reload",
                     "type": "Button",
                     "id": "ea00f61f-da25-4c35-8ec2-6f5ff930a267",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchGameMode",
+                    "type": "Button",
+                    "id": "331bf1cf-efd5-4935-b35d-ca99f7b82fb8",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -522,6 +531,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5b55e32f-bc81-4419-be56-e9a2669cae6a",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchGameMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
