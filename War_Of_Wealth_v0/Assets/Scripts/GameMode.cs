@@ -19,26 +19,28 @@ public class GameMode : MonoBehaviour
     //public void switchGameModeButton()
     void Update()
     {
-        if (Keyboard.current.gKey.wasPressedThisFrame)
+        //if (Keyboard.current.gKey.wasPressedThisFrame)
+    }
+
+    // switch to other game mode
+    public void buttonSwitchGameMode()
+    {
+        if (!isFPSMode)
         {
-            if (!isFPSMode)
-            {
-                boardEmpty.SetActive(false);
-                disableFPS.EnableFPSObjects();
+            boardEmpty.SetActive(false);
+            disableFPS.EnableFPSObjects();
 
-                isFPSMode = true;
-                Debug.Log("switched from board to fps mode");
-            }
-            else // isFPSMode
-            {
-                disableFPS.DisableFPSObjects();
-                boardEmpty.SetActive(true);
+            isFPSMode = true;
+            Debug.Log("switched from board to fps mode");
+        }
+        else // isFPSMode
+        {
+            disableFPS.DisableFPSObjects();
+            boardEmpty.SetActive(true);
 
-                isFPSMode = false;
-                Debug.Log("switched from fps to board mode");
-            }
+            isFPSMode = false;
+            Debug.Log("switched from fps to board mode");
         }
     }
 
-    
 }
