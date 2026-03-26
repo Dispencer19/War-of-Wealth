@@ -9,10 +9,11 @@ public class DisableFPS : MonoBehaviour
     [SerializeField] GameObject mainCamera;
     [SerializeField] GameObject rollButton;
 
+    [SerializeField] GameObject Reticle;
+
     [SerializeField] float mainCameraX = 0.0f;
     [SerializeField] float mainCameraY = 69.31f;
     [SerializeField] float mainCameraZ = 10.4f;
-
 
     void Start()
     {
@@ -23,20 +24,29 @@ public class DisableFPS : MonoBehaviour
     {
         playerCamera.SetActive(false);
         player.SetActive(false);
-        //canvas.SetActive(false);
         mainCam.enabled = false;
+
         mainCamera.transform.position = new Vector3(mainCameraX, mainCameraY, mainCameraZ);
 
         rollButton.SetActive(true);
+
+        //Enable mouse cursor for UI
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Reticle.SetActive(false);
     }
 
     public void EnableFPSObjects()
     {
         playerCamera.SetActive(true);
         player.SetActive(true);
-        //canvas.SetActive(true);
         mainCam.enabled = true;
 
         rollButton.SetActive(false);
+
+        //Lock cursor again for FPS mode
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        Reticle.SetActive(true);
     }
 }

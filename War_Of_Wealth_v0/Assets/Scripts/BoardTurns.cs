@@ -1,7 +1,9 @@
+using Unity.AppUI.UI;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
 using UnityEngine.UI;
+using TMPro;
 
 public class BoardTurns : MonoBehaviour
 {
@@ -13,10 +15,9 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] public static int numTotalPlayers = 4;
     int[] playerLocations = new int[numTotalPlayers]; // they all start on square 0
 
-    [SerializeField]
-    GameObject[] playerGameObjects = new GameObject[numTotalPlayers];
-
+    [SerializeField] GameObject[] playerGameObjects = new GameObject[numTotalPlayers];
     [SerializeField] int numTotalLocations = 40;
+    [SerializeField] BoardSpace[] boardSpaces;
     [Tooltip("Total number of squares on the monopoly board")]
     [SerializeField] int numRowLocations = 10;
     [Tooltip("Number squares per row on the board")]
@@ -24,6 +25,8 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] BoardVariables boardVariables;
     [SerializeField] Cooldown cooldown;
     [SerializeField] DisableFPS disableFPS;
+
+    [SerializeField] TextMeshProUGUI currentPlayerStats;
 
     void Start()
     {
@@ -42,13 +45,18 @@ public class BoardTurns : MonoBehaviour
 
             Debug.Log("BoardTurnButton pressed. Next turn");
 
-            //                             curr location      dice roll between 1 to 6 (inclusive)     overflow 40 squares
-            playerLocations[currPlayer] = (playerLocations[currPlayer] + Random.Range(1, 7)) % numTotalLocations;
-            playerGameObjects[currPlayer].transform.position = boardVariables.Location(currPlayer, playerLocations[currPlayer], numRowLocations);
+            //curr location      dice roll between 2 to 12 (inclusive)     overflow 40 squares
+            
+            //int diceRoll = Random.Range(2,12);
+            int diceRoll = 3; // for testing purposes, just move 2 spaces every turn
+            playerLocations[currPlayer] = 
+                (playerLocations[currPlayer] + diceRoll) % numTotalLocations;
 
-            Debug.Log("Moving player " + currPlayer + " to (" + boardVariables.stringLastLocation() + ")");
+            playerGameObjects[currPlayer].transform.position =
+                boardVariables.Location(currPlayer, playerLocations[currPlayer], numRowLocations);
 
-            currPlayer = (currPlayer + 1) % numTotalPlayers;
+            BoardSpace landedSpace = boardSpaces[playerLocations[currPlayer]];
+            landedSpace.Land(currPlayer);
         //}
         //else
         //{
@@ -60,4 +68,11 @@ public class BoardTurns : MonoBehaviour
     {
         return currPlayer;
     }
+
+    void Update()
+    {
+        currentPlayerStats.text = $"Player {currPlayer + 1}'s turn\nMoney: ${currPlayer + 1}"; // for testing purposes, just display player number and money. Will add properties owned later
+    }
+
+
 }
