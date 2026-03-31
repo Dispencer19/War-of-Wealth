@@ -8,6 +8,9 @@ public class FightTeleport : MonoBehaviour
     public Transform player1Spawn;
     public Transform player2Spawn;
 
+    public PlayerHealth player1Health;
+    public PlayerHealth player2Health;
+
     public void StartFight()
     {
         // Stop physics movement
@@ -20,5 +23,9 @@ public class FightTeleport : MonoBehaviour
         // Teleport players
         player1.position = player1Spawn.position;
         player2.position = player2Spawn.position;
+
+        // Reset health
+        player1Health.ResetHealth();
+        player2Health.ResetHealth();
     }
 }

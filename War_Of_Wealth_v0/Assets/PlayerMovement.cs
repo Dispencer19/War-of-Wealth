@@ -21,6 +21,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform orientation;
 
+    [Header("Status")]
+    public bool canMove = true; // moved inside the class
+
     private float horizontalInput;
     private float verticalInput;
 
@@ -34,39 +37,39 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void Update()
-{
-    // Respawn check
-    if (transform.position.y <= -50f)
     {
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        transform.position = Vector3.zero;
+        if (!canMove) return;
+
+        // Respawn check
+        if (transform.position.y <= -50f)
+        {
+            rb.linearVelocity = Vector3.zero;
+            transform.position = Vector3.zero;
+        }
+
+        // Ground check
+        grounded = Physics.Raycast(
+            transform.position,
+            Vector3.down,
+            playerHeight * 0.5f + 0.2f,
+            whatIsGround
+        );
+
+        ReadInput();
+        ControlDrag();
+
+        // Jump input (Space)
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
+        {
+            readyToJump = false;
+            Jump();
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
     }
-
-    // Ground check
-    grounded = Physics.Raycast(
-        transform.position,
-        Vector3.down,
-        playerHeight * 0.5f + 0.2f,
-        whatIsGround
-    );
-
-    ReadInput();
-    ControlDrag();
-
-    // Jump input (Space)
-    if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
-    {
-        readyToJump = false;
-        Jump();
-        Invoke(nameof(ResetJump), jumpCooldown);
-    }
-}
-
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        if (canMove) MovePlayer();
     }
 
     private void ReadInput()
@@ -99,9 +102,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Jump()
     {
-        // Reset Y velocity so jumps feel consistent
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
@@ -112,6 +113,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void ControlDrag()
     {
-        rb.linearDamping = grounded ? groundDrag : 0f;
+        rb.linearDamping = grounded ? groundDrag : 0f; // linearDamping → drag
     }
 }
