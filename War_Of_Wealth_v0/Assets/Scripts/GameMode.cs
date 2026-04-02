@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class GameMode : MonoBehaviour
 {
-    bool isFPSMode = false;
+    [SerializeField] bool isFPSMode = false;
     [SerializeField] DisableFPS disableFPS;
     [SerializeField] GameObject boardEmpty;
 
@@ -13,6 +13,10 @@ public class GameMode : MonoBehaviour
         if(!isFPSMode)
         {
             disableFPS.DisableFPSObjects();
+        }
+        else // isFPSMode
+        {
+            disableFPS.EnableFPSObjects();
         }
     }
 

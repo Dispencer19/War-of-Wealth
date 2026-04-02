@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -30,10 +31,13 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 moveDirection;
     private Rigidbody rb;
 
+    PhotonView view;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        view = GetComponent<PhotonView>();
     }
 
     private void Update()
@@ -55,15 +59,18 @@ public class PlayerMovement : MonoBehaviour
             whatIsGround
         );
 
-        ReadInput();
-        ControlDrag();
-
-        // Jump input (Space)
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
+        if (view.IsMine)
         {
-            readyToJump = false;
-            Jump();
-            Invoke(nameof(ResetJump), jumpCooldown);
+            ReadInput();
+            ControlDrag();
+
+            // Jump input (Space)
+            if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
+            {
+                readyToJump = false;
+                Jump();
+                Invoke(nameof(ResetJump), jumpCooldown);
+            }
         }
     }
 

@@ -4,9 +4,10 @@ public class DisableFPS : MonoBehaviour
 {
     [SerializeField] GameObject playerCamera;
     [SerializeField] GameObject player;
-    [SerializeField] GameObject canvas;
+
     [SerializeField] MainCam mainCam;
     [SerializeField] GameObject mainCamera;
+
     [SerializeField] GameObject rollButton;
 
     [SerializeField] GameObject Reticle;
@@ -17,6 +18,9 @@ public class DisableFPS : MonoBehaviour
 
     void Start()
     {
+        playerCamera = GameObject.FindWithTag("MainCamera");
+        player = GameObject.FindWithTag("Player");
+
         mainCam = MainCam.FindFirstObjectByType<MainCam>();
     }
 
