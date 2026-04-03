@@ -25,6 +25,8 @@ public class TileEffects : MonoBehaviour
     [SerializeField] public GameObject InJailUI;
 
     [SerializeField] public BoardTurns boardTurns;
+
+    [SerializeField] public GameObject AimChallengeUI;
     
     public void BuyProperty(BoardSpace space)
     {
@@ -106,5 +108,11 @@ public class TileEffects : MonoBehaviour
     {
         StartTurnUI.SetActive(false);
         EndTurnUI.SetActive(true);
+    }
+
+    public void AimChallenge()
+    {
+        StartTurnUI.SetActive(false);
+        AimChallengeUI.SetActive(true);
     }
 }

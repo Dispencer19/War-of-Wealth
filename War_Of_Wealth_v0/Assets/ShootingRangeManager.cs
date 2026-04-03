@@ -9,6 +9,11 @@ public class ShootingRangeManager : MonoBehaviour
     public float backgroundDistance = 15f;
     public Transform backWall;
 
+    public GameMode gameMode;
+    public GameObject AimChallengeUI;
+
+    public GameObject FPSCanvas;
+
     public void EnterShootingRange()
     {
         // Teleport player
@@ -20,5 +25,13 @@ public class ShootingRangeManager : MonoBehaviour
 
         // Adjust wall distance
         backWall.localPosition = new Vector3(0, 0, backgroundDistance);
+
+        // Switch to FPS mode
+        gameMode.buttonSwitchGameMode();
+        AimChallengeUI.SetActive(false);
+        FPSCanvas.SetActive(true);
+        
+
+
     }
 }

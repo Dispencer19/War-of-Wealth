@@ -11,15 +11,12 @@ public class DisableFPS : MonoBehaviour
     [SerializeField] GameObject rollButton;
 
     [SerializeField] GameObject Reticle;
-
     [SerializeField] float mainCameraX = 0.0f;
     [SerializeField] float mainCameraY = 69.31f;
     [SerializeField] float mainCameraZ = 10.4f;
 
     void Start()
     {
-        playerCamera = GameObject.FindWithTag("MainCamera");
-        player = GameObject.FindWithTag("Player");
 
         mainCam = MainCam.FindFirstObjectByType<MainCam>();
     }
@@ -32,7 +29,6 @@ public class DisableFPS : MonoBehaviour
 
         mainCamera.transform.position = new Vector3(mainCameraX, mainCameraY, mainCameraZ);
 
-        rollButton.SetActive(true);
 
         //Enable mouse cursor for UI
         Cursor.lockState = CursorLockMode.None;
@@ -45,8 +41,6 @@ public class DisableFPS : MonoBehaviour
         playerCamera.SetActive(true);
         player.SetActive(true);
         mainCam.enabled = true;
-
-        rollButton.SetActive(false);
 
         //Lock cursor again for FPS mode
         Cursor.lockState = CursorLockMode.Locked;
