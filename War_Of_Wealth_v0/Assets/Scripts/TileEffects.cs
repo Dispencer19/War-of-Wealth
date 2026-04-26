@@ -1,3 +1,4 @@
+using Unity.Multiplayer.PlayMode;
 using Unity.VisualScripting;
 using UnityEditor.Build.Content;
 using UnityEngine;
@@ -40,7 +41,7 @@ public class TileEffects : MonoBehaviour
 
         var ui = BuyPropertyUI.GetComponent<BuyPropertyUI>();
 
-        ui.Show(space);
+        ui.Show(space, boardTurns.currPlayer);
     }
 
     public void PayRent(BoardSpace space)
@@ -56,10 +57,8 @@ public class TileEffects : MonoBehaviour
             Debug.Log("This property is owned by Player " + space.ownerPlayerIndex + ". Player must pay rent of " + space.rent);
         }
         
-        
-        PayRentUI.SetActive(true);
-
-     
+        var ui = PayRentUI.GetComponent<PayRentUI>();
+        ui.Show(space, boardTurns.currPlayer);
     }
 
     public void PassGo()

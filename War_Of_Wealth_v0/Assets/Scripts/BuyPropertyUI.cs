@@ -5,22 +5,26 @@ using UnityEngine.UI;
 public class BuyPropertyUI : MonoBehaviour
 {
     public TextMeshProUGUI promptText;
-
-    private BoardSpace currentSpace;
-
+    public Image cardImageUI;
     public GameObject EndTurnUI;
 
-    // Drag your UI Image (the card display) here in the Inspector
-    public Image cardImageUI;
+    private BoardSpace currentSpace;
+    private int currentPlayerIndex;
+    private BoardTurns boardTurns;
 
-    public void Show(BoardSpace space)
+    private void Awake()
+    {
+        boardTurns = FindObjectOfType<BoardTurns>();
+    }
+
+    // Called when a player lands on a property
+    public void Show(BoardSpace space, int playerIndex)
     {
         currentSpace = space;
+        currentPlayerIndex = playerIndex;
 
-        // Update text
         promptText.text = $"Buy {space.spaceName} for ${space.price}?";
 
-        // Update the card image (Sprite)
         if (space.cardimage != null)
         {
             cardImageUI.sprite = space.cardimage;
@@ -29,13 +33,31 @@ public class BuyPropertyUI : MonoBehaviour
         else
         {
             cardImageUI.sprite = null;
-            cardImageUI.enabled = false; // or leave enabled if you want an empty frame
+            cardImageUI.enabled = false;
         }
+
+        gameObject.SetActive(true);
     }
 
     public void OnBuy()
     {
-        Debug.Log("Player bought " + currentSpace.spaceName);
+        //Debug.Log("Player bought " + currentSpace.spaceName);
+
+        // Get the player's bank account
+        PlayerBankAccounts bank = boardTurns.playerGameObjects[currentPlayerIndex]
+            .GetComponent<PlayerBankAccounts>();
+
+        // Deduct money
+        bank.RemoveMoney(currentSpace.price);
+
+        // Assign property
+        bank.AddProperty(currentSpace);
+
+        // Mark the board space as owned
+        currentSpace.isOwned = true;
+        currentSpace.ownerPlayerIndex = currentPlayerIndex;
+
+        // Close UI
         gameObject.SetActive(false);
         EndTurnUI.SetActive(true);
     }
@@ -43,6 +65,7 @@ public class BuyPropertyUI : MonoBehaviour
     public void OnCancel()
     {
         Debug.Log("Player declined to buy.");
+
         gameObject.SetActive(false);
         EndTurnUI.SetActive(true);
     }

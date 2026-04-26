@@ -11,6 +11,16 @@ public class FightTeleport : MonoBehaviour
     public PlayerHealth player1Health;
     public PlayerHealth player2Health;
 
+    void Start()
+    {
+        player1 = GameObject.Find("Player1").transform;
+        player2 = GameObject.Find("Player2").transform;
+        player1Health = player1.GetComponent<PlayerHealth>();
+        player2Health = player2.GetComponent<PlayerHealth>();   
+        player1Spawn = GameObject.Find("Player1FightSpawn").transform;
+        player2Spawn = GameObject.Find("Player2FightSpawn").transform;
+    }
+
     public void StartFight()
     {
         // Stop physics movement

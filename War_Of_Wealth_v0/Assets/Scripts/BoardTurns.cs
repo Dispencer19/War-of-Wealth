@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class BoardTurns : MonoBehaviour
 {
@@ -17,31 +18,52 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] BoardVariables boardVariables;
 
     [SerializeField] TextMeshProUGUI currentPlayerStats;
+    [SerializeField] TextMeshProUGUI diceRollResultText;
+
+    [SerializeField] TextMeshProUGUI currentplayerMoney;
 
     [SerializeField] public GameObject endTurnUI;
     [SerializeField] public GameObject StartTurnUI;
 
+    public DiceRoller diceRoller;
+
     void Start()
     {
         boardVariables = GetComponent<BoardVariables>();
+
     }
 
     public void BoardTurnButton()
     {
-        Debug.Log("BoardTurnButton pressed.");
+        //Debug.Log("BoardTurnButton pressed.");
 
-        int diceRoll = Random.Range(2, 13);
-        Debug.Log($"Player {currPlayer + 1} rolled a {diceRoll}");
+        // Disable the button here if needed
 
-        playerLocations[currPlayer] =
-            (playerLocations[currPlayer] + diceRoll) % numTotalLocations;
+        StartCoroutine(diceRoller.RollDice(result =>
+        {
+            int diceRoll = result;
 
-        playerGameObjects[currPlayer].transform.position =
-        boardVariables.Location(currPlayer, playerLocations[currPlayer]);
-        
-        BoardSpace landedSpace = boardSpaces[playerLocations[currPlayer]];
-        landedSpace.Land(currPlayer);
+            //Debug.Log($"Player {currPlayer + 1} rolled a {diceRoll}");
+
+            diceRollResultText.text = $"Rolled a {diceRoll}!";
+
+            // Update location
+            playerLocations[currPlayer] =
+                (playerLocations[currPlayer] + diceRoll) % numTotalLocations;
+
+            // Move the player visually
+            playerGameObjects[currPlayer].transform.position =
+                boardVariables.Location(currPlayer, playerLocations[currPlayer]);
+
+            // Trigger board space logic
+            BoardSpace landedSpace = boardSpaces[playerLocations[currPlayer]];
+            landedSpace.Land(currPlayer);
+
+
+
+        }));
     }
+
 
     public void EndTurn()
     {
@@ -58,7 +80,23 @@ public class BoardTurns : MonoBehaviour
 
     void Update()
     {
+        PlayerBankAccounts bank = playerGameObjects[currPlayer].GetComponent<PlayerBankAccounts>();
+        int money = bank != null ? bank.currentBalance : 0;
+
+        List<string> ownedProperties = new List<string>();
+        for (int i = 0; i < boardSpaces.Length; i++)
+        {
+            if (boardSpaces[i].ownerPlayerIndex == currPlayer)
+            {
+                ownedProperties.Add(boardSpaces[i].spaceName);
+            }
+        }
+
+        string propertiesText = ownedProperties.Count > 0 ? "\nProperties: " + string.Join(", ", ownedProperties) : "\nNo properties owned";
+
         currentPlayerStats.text =
-            $"Player {currPlayer + 1}'s turn\nMoney: ${currPlayer + 1}";
+            $"Player {currPlayer + 1}'s turn\n{propertiesText}";
+        currentplayerMoney.text = $"${money}";
     }
+
 }

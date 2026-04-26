@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class SpawnPlayers : MonoBehaviour
 {
@@ -13,7 +14,17 @@ public class SpawnPlayers : MonoBehaviour
 
     private void Start()
     {
-        Vector3 randomPosition = new Vector3(Random.Range(minX, maxX), y, Random.Range(minZ, maxZ));
-        PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
+        Vector3 randomPosition = new Vector3(
+            Random.Range(minX, maxX),
+            y,
+            Random.Range(minZ, maxZ)
+        );
+
+        // Instantiate the player
+        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
+
+        // Assign name based on join order
+        int playerNumber = PhotonNetwork.CurrentRoom.PlayerCount;
+        player.name = "Player" + playerNumber;
     }
 }

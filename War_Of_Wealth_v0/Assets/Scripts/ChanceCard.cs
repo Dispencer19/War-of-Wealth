@@ -21,7 +21,7 @@ public class ChanceCard : MonoBehaviour
         int index = Random.Range(0, cards.Length);
         ChanceOption card = cards[index];
 
-        Debug.Log($"Drew Chance Card: {card.cardName} - {card.description}");
+        //Debug.Log($"Drew Chance Card: {card.cardName} - {card.description}");
 
         int player = boardTurns.currPlayer;
 
