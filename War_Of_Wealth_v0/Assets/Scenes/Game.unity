@@ -23317,7 +23317,7 @@ MonoBehaviour:
   boardTurns: {fileID: 1614921049}
   gameMode: {fileID: 1110892755}
   FPSCanvas: {fileID: 53567766}
-  playerPrefab: {fileID: 0}
+  playerPrefab: {fileID: 488097997}
   player1FightSpawn: {fileID: 1120632954}
   player2FightSpawn: {fileID: 1182671072}
   fightUI: {fileID: 577634831}
