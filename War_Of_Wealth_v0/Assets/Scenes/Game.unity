@@ -631,7 +631,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ce4c3a6f945a2a44ab0dbda2cc768aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnPlayers
-  playerPrefab: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+  playerPrefab: {fileID: 488097997}
   minX: -58.6
   maxX: -66.6
   y: 16.8
@@ -4596,6 +4596,29 @@ MonoBehaviour:
   maxHealth: 200
   healthBar: {fileID: 505460032}
   youDiedText: {fileID: 894088320}
+--- !u!114 &488098006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488097997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f798b2910f043eb4fb64e437fa079789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  moveSpeed: 6
+  groundDrag: 5
+  jumpForce: 7
+  jumpCooldown: 0.25
+  airMultiplier: 0.4
+  playerHeight: 2
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
+  orientation: {fileID: 0}
+  canMove: 1
 --- !u!1 &495332193 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -213666939420765540, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -14416,7 +14439,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1692367799}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ShootingRangeManager, Assembly-CSharp
         m_MethodName: EnterShootingRange
         m_Mode: 1
@@ -20462,7 +20485,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1692367800}
-  - component: {fileID: 1692367799}
+  - component: {fileID: 1692367801}
   m_Layer: 0
   m_Name: ShootingRangeManager
   m_TagString: Untagged
@@ -20470,18 +20493,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1692367799
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1692367798}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de8c461e6139dc84cb8e6203daac725d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ShootingRangeManager
 --- !u!4 &1692367800
 Transform:
   m_ObjectHideFlags: 0
@@ -20497,6 +20508,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 998065979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1692367801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1692367798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54bf22d7da8c4f2429f79991b9f8375a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShootingRangeManager
+  player1: {fileID: 4568313392657937323}
+  shootingRangeSpawn: {fileID: 1688861548}
+  playerMovement: {fileID: 4568313392657937322}
+  backgroundDistance: 15
+  backWall: {fileID: 2075410052}
+  gameMode: {fileID: 1110892755}
+  AimChallengeUI: {fileID: 577634831}
+  FPSCanvas: {fileID: 53567766}
+  StatsUI: {fileID: 1867579876}
 --- !u!1 &1696370704 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8675660419491173655, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -23654,7 +23686,26 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 488098004}
+    - targetCorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 488098006}
   m_SourcePrefab: {fileID: 100100000, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+--- !u!114 &4568313392657937322 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5670494912518288031, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+  m_PrefabInstance: {fileID: 4568313392657937321}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488097997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f798b2910f043eb4fb64e437fa079789, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+--- !u!4 &4568313392657937323 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1120177124493640971, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+  m_PrefabInstance: {fileID: 4568313392657937321}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &5152565004204616188
 GameObject:
   m_ObjectHideFlags: 0
