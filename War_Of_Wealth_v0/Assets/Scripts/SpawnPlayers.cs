@@ -12,7 +12,7 @@ public class SpawnPlayers : MonoBehaviour
     public float minZ;
     public float maxZ;
 
-    private void Start()
+    private void Awake()
     {
         Vector3 randomPosition = new Vector3(
             Random.Range(minX, maxX),
@@ -26,5 +26,6 @@ public class SpawnPlayers : MonoBehaviour
         // Assign name based on join order
         int playerNumber = PhotonNetwork.CurrentRoom.PlayerCount;
         player.name = "Player" + playerNumber;
+        Debug.Log("Spawned player: "+player.name);
     }
 }

@@ -15,7 +15,7 @@ public class BoardTurns : MonoBehaviour
     public DiceRoller diceRoller;
 
     [Header("Movement")]
-    [SerializeField] float moveSpeed = 6f;
+    [SerializeField] float moveSpeed = 12f;
     [SerializeField] float stepPause = 0.1f;
 
     [Header("Players")]

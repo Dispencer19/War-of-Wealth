@@ -8,6 +8,7 @@ public class PlayerHealth : MonoBehaviour
     private int currentHealth;
 
     public Slider healthBar;
+    // public Canvas canvas;
     public GameObject youDiedText;
 
     void Start()
@@ -20,7 +21,20 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = maxHealth;
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
+        // canvas = Object.FindFirstObjectByType<Canvas>();
+        // canvas = transform.Find("FPS Canvas").canvas;
+        // youDiedText = transform.Find("FPS Canvas/HealthBar").GetComponent<Slider>;
+        // youDiedText = GameObject.Find("HealthBar");
         youDiedText.SetActive(false);
+        Invoke("CheckIfInitialized", 3.0f);
+    }
+
+    public void CheckIfInitialized()
+    {
+        if(healthBar == null)
+            Debug.Log("healthbar not found");
+        if(youDiedText == null)
+            Debug.Log("youDiedText not found");
     }
 
     public void TakeDamage(int damage)

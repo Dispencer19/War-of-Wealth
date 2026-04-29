@@ -1,12 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
-public class ShootingRangeManager : MonoBehaviour
+public class ShootingRangeManager_SpencerHP : MonoBehaviour
 {
     [Header("Player")]
     public Transform player1;
     public Transform shootingRangeSpawn;
-    public PlayerMovement playerMovement;
+    public PlayerMovement_SpencerHP playerMovement;
 
     [Header("Environment")]
     public float backgroundDistance = 15f;

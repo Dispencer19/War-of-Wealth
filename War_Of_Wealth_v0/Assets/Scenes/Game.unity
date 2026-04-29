@@ -2288,6 +2288,7 @@ MonoBehaviour:
   boardTurns: {fileID: 1614921049}
   boardVariables: {fileID: 1614921054}
   ChanceCardUI: {fileID: 352289699}
+  endTurnUI: {fileID: 0}
 --- !u!1 &354434440
 GameObject:
   m_ObjectHideFlags: 0
@@ -4563,62 +4564,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
   m_PrefabInstance: {fileID: 4568313392657937321}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &488098004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488097997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 166394aab28db49139468a922bf5e6ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FightTeleport
-  player1: {fileID: 0}
-  player2: {fileID: 0}
-  player1Spawn: {fileID: 0}
-  player2Spawn: {fileID: 0}
-  player1Health: {fileID: 0}
-  player2Health: {fileID: 0}
---- !u!114 &488098005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488097997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e102747874c810488ec1e0601e1f243, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
-  maxHealth: 200
-  healthBar: {fileID: 505460032}
-  youDiedText: {fileID: 894088320}
---- !u!114 &488098006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488097997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f798b2910f043eb4fb64e437fa079789, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  moveSpeed: 6
-  groundDrag: 5
-  jumpForce: 7
-  jumpCooldown: 0.25
-  airMultiplier: 0.4
-  playerHeight: 2
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 64
-  orientation: {fileID: 0}
-  canMove: 1
 --- !u!1 &495332193 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -213666939420765540, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -11887,6 +11832,8 @@ MonoBehaviour:
   muzzleFlash: {fileID: 660491082}
   Tracer: {fileID: 1390227465}
   ammoText: {fileID: 1493003277}
+  hitEffect: {fileID: 0}
+  score: 0
 --- !u!82 &874737608
 AudioSource:
   m_ObjectHideFlags: 0
@@ -15452,6 +15399,7 @@ MonoBehaviour:
   boardTurns: {fileID: 1614921049}
   boardVariables: {fileID: 1614921054}
   ChanceCardUI: {fileID: 1361222434}
+  endTurnUI: {fileID: 420533272}
 --- !u!1 &1363494422 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1998131547146259539, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -17997,14 +17945,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a2e6675ed4ba0244af1df53f73a5367, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardTurns
-  currPlayer: 0
-  playerLocations: 00000000000000000000000000000000
+  boardVariables: {fileID: 1614921054}
+  currentPlayerStats: {fileID: 2083885994}
+  diceRollResultText: {fileID: 1257730318}
+  currentplayerMoney: {fileID: 2028565674}
+  diceRoller: {fileID: 966355489}
+  moveSpeed: 12
+  stepPause: 0.1
   playerGameObjects:
   - {fileID: 336280795}
   - {fileID: 1569494157}
   - {fileID: 1611281687}
   - {fileID: 933686420}
-  numTotalLocations: 40
   boardSpaces:
   - spaceIndex: 0
     spaceName: Go!
@@ -19238,14 +19190,9 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  numRowLocations: 10
-  boardVariables: {fileID: 1614921054}
-  currentPlayerStats: {fileID: 2083885994}
-  diceRollResultText: {fileID: 1257730318}
-  currentplayerMoney: {fileID: 2028565674}
-  endTurnUI: {fileID: 420533272}
-  StartTurnUI: {fileID: 916358774}
-  diceRoller: {fileID: 966355489}
+  playerLocations: 00000000000000000000000000000000
+  currPlayer: 0
+  numTotalLocations: 40
 --- !u!114 &1614921050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20522,13 +20469,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShootingRangeManager
   player1: {fileID: 4568313392657937323}
   shootingRangeSpawn: {fileID: 1688861548}
-  playerMovement: {fileID: 4568313392657937322}
+  playerMovement: {fileID: 0}
   backgroundDistance: 15
   backWall: {fileID: 2075410052}
   gameMode: {fileID: 1110892755}
   AimChallengeUI: {fileID: 577634831}
   FPSCanvas: {fileID: 53567766}
   StatsUI: {fileID: 1867579876}
+  targetPrefab: {fileID: 0}
+  spawnStart: {fileID: 0}
+  spawnEnd: {fileID: 0}
+  spawnInterval: 1.5
+  maxTargets: 10
 --- !u!1 &1696370704 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8675660419491173655, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -23664,6 +23616,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2401843851317142546, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+      propertyPath: healthBar
+      value: 
+      objectReference: {fileID: 505460032}
+    - target: {fileID: 2401843851317142546, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
+      propertyPath: youDiedText
+      value: 
+      objectReference: {fileID: 894088320}
     - target: {fileID: 4907977546980238207, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
       propertyPath: sceneViewId
       value: 1
@@ -23672,35 +23632,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 488098005}
-    - targetCorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 488098004}
-    - targetCorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 488098006}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
---- !u!114 &4568313392657937322 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5670494912518288031, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
-  m_PrefabInstance: {fileID: 4568313392657937321}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488097997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f798b2910f043eb4fb64e437fa079789, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
 --- !u!4 &4568313392657937323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1120177124493640971, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}

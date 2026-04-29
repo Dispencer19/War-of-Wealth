@@ -11,14 +11,28 @@ public class FightTeleport : MonoBehaviour
     public PlayerHealth player1Health;
     public PlayerHealth player2Health;
 
-    private void Awake() 
-        
+    private void Start()     
+    {
+        Invoke("DelayedInitialize",5.0f);
+        Invoke("CheckIfInitialized",10.0f);
+    }
+
+    public void DelayedInitialize()
     {
         player1 = GameObject.Find("Player1").transform;
         player2 = GameObject.Find("Player2").transform;
         player1Health = player1.GetComponent<PlayerHealth>();
         player2Health = player2.GetComponent<PlayerHealth>();   
     }
+
+    public void CheckIfInitialized()
+    {
+        if(player1 == null)
+            Debug.Log("player1 was not found during start of fightteleport");
+        if(player2 == null)
+            Debug.Log("player2 was not found during start of fightteleport");
+    }
+
     public void StartFight()
     {
         // Stop physics movement
