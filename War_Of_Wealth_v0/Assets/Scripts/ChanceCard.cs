@@ -8,6 +8,7 @@ public class ChanceCard : MonoBehaviour
     public BoardVariables boardVariables; // Drag your BoardVariables object here
 
     public GameObject ChanceCardUI; // UI panel to show card details (optional)
+    public GameObject endTurnUI; // UI panel for end turn options (optional)
 
     public void DrawCard()
     {
@@ -42,6 +43,6 @@ public class ChanceCard : MonoBehaviour
 
         // After drawing, show End Turn UI
         ChanceCardUI.SetActive(false); // Hide card UI
-        boardTurns.endTurnUI.SetActive(true);
+        endTurnUI.SetActive(true);
     }
 }

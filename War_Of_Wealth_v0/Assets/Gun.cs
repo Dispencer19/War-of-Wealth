@@ -9,8 +9,10 @@ public class Gun : MonoBehaviour
     public float damage = 25f;
     public float range = 100f;
     public float fireRate = 0.2f;
+
     public AudioClip firesound;
     public AudioClip reloadSound;
+
     public Transform muzzle;
     public float reloadtime = 1.5f;
     public int maxammo = 6;
@@ -21,7 +23,12 @@ public class Gun : MonoBehaviour
     public LineRenderer Tracer;
 
     [Header("UI")]
-    public TextMeshProUGUI ammoText; 
+    public TextMeshProUGUI ammoText;
+
+    [Header("Optional Effects")]
+    public GameObject hitEffect;
+    public int score = 0;
+
     private float nextTimeToFire = 0f;
     private int currentammo;
     private bool isReloading = false;
@@ -42,7 +49,7 @@ public class Gun : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         currentammo = maxammo;
 
-        UpdateAmmoUI();  
+        UpdateAmmoUI();
     }
 
     private void OnEnable() => controls.Enable();
@@ -69,11 +76,10 @@ public class Gun : MonoBehaviour
         }
 
         currentammo--;
-        UpdateAmmoUI(); 
+        UpdateAmmoUI();
 
-        Vector3 startpoint = muzzle.position;
-        Vector3 direction = muzzle.forward;
-        Vector3 endpoint;
+        Vector3 startPoint = muzzle.position;
+        Vector3 endPoint;
 
         if (muzzleFlash != null)
             muzzleFlash.Play();
@@ -81,21 +87,35 @@ public class Gun : MonoBehaviour
         audioSource.Stop();
         audioSource.PlayOneShot(firesound);
 
+        Ray ray = new Ray(fpsCam.transform.position, fpsCam.transform.forward);
         RaycastHit hit;
-        if (Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, range))
-        {
-            endpoint = hit.point;
 
+        if (Physics.Raycast(ray, out hit, range))
+        {
+            endPoint = hit.point;
+
+            // HIT TARGET CHECK
             Target target = hit.transform.GetComponent<Target>();
             if (target != null)
+            {
                 target.TakeDamage(damage);
+
+                // SCORE SYSTEM
+                score += 10;
+            }
+
+            // HIT EFFECT
+            if (hitEffect != null)
+            {
+                Instantiate(hitEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            }
         }
         else
         {
-            endpoint = startpoint + direction * range;
+            endPoint = startPoint + fpsCam.transform.forward * range;
         }
 
-        StartCoroutine(ShowTracer(startpoint, endpoint));
+        StartCoroutine(ShowTracer(startPoint, endPoint));
     }
 
     private IEnumerator ShowTracer(Vector3 start, Vector3 end)
@@ -130,19 +150,16 @@ public class Gun : MonoBehaviour
         currentammo = maxammo;
         isReloading = false;
 
-        UpdateAmmoUI();  
+        UpdateAmmoUI();
     }
 
     void UpdateAmmoUI()
     {
-        if (isReloading)
-        {
-            if (ammoText != null)
-                ammoText.text = "Reloading...";
+        if (ammoText == null)
             return;
-        }
-        
-        if (ammoText != null)
-            ammoText.text = currentammo + " / " + maxammo;
+
+        ammoText.text = isReloading
+            ? "Reloading..."
+            : currentammo + " / " + maxammo;
     }
 }
