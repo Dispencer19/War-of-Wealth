@@ -13618,7 +13618,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1120632954}
   m_Layer: 0
-  m_Name: FightSpawn1
+  m_Name: Player1FightSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13929,7 +13929,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1182671072}
   m_Layer: 0
-  m_Name: FightSpawn2
+  m_Name: Player2FightSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

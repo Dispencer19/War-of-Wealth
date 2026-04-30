@@ -309,12 +309,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 166394aab28db49139468a922bf5e6ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FightTeleport
-  player1: {fileID: 0}
-  player2: {fileID: 0}
   player1Spawn: {fileID: 0}
   player2Spawn: {fileID: 0}
-  player1Health: {fileID: 0}
-  player2Health: {fileID: 0}
+  player1SpawnName: Player1FightSpawn
+  player2SpawnName: Player2FightSpawn
 --- !u!114 &8790075717160640154
 MonoBehaviour:
   m_ObjectHideFlags: 0
