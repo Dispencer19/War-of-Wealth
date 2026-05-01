@@ -13,7 +13,7 @@ public class DisableFPS : MonoBehaviour
     [SerializeField] GameObject Reticle;
     [SerializeField] float mainCameraX = 0.0f;
     [SerializeField] float mainCameraY = 69.31f;
-    [SerializeField] float mainCameraZ = 10.4f;
+    [SerializeField] float mainCameraZ = 0.0f;
 
     void Start()
     {

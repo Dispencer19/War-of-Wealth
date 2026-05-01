@@ -12,6 +12,9 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] TextMeshProUGUI diceRollResultText;
     [SerializeField] TextMeshProUGUI currentplayerMoney;
 
+    [SerializeField] GameObject StartTurnButton;   
+    [SerializeField] GameObject EndTurnUI;     
+
     public DiceRoller diceRoller;
 
     [Header("Movement")]
@@ -89,10 +92,15 @@ public class BoardTurns : MonoBehaviour
 
     public void EndTurn()
     {
-        if (isMoving) return;
+        isMoving = false;
 
         currPlayer = (currPlayer + 1) % playerGameObjects.Length;
         Debug.Log($"Player {currPlayer + 1}'s turn");
+
+        // Update UI for next player
+        EndTurnUI.SetActive(false);
+        StartTurnButton.SetActive(true);
+
     }
 
     void Update()

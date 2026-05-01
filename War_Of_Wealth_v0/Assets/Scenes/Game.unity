@@ -13454,7 +13454,7 @@ MonoBehaviour:
   Reticle: {fileID: 1375405061}
   mainCameraX: 0
   mainCameraY: 69.31
-  mainCameraZ: 10.4
+  mainCameraZ: 0
 --- !u!4 &1110892757
 Transform:
   m_ObjectHideFlags: 0
@@ -14038,7 +14038,7 @@ Transform:
   m_GameObject: {fileID: 1182800147}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
-  m_LocalPosition: {x: -5.75, y: 73.11, z: 0}
+  m_LocalPosition: {x: -5.75, y: 69.07, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -17949,6 +17949,8 @@ MonoBehaviour:
   currentPlayerStats: {fileID: 2083885994}
   diceRollResultText: {fileID: 1257730318}
   currentplayerMoney: {fileID: 2028565674}
+  StartTurnButton: {fileID: 916358774}
+  EndTurnUI: {fileID: 420533272}
   diceRoller: {fileID: 966355489}
   moveSpeed: 12
   stepPause: 0.1
