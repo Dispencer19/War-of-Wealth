@@ -8,7 +8,6 @@ public class PlayerHealth : MonoBehaviour
     private int currentHealth;
 
     public Slider healthBar;
-    // public Canvas canvas;
     public GameObject youDiedText;
 
     void Start()
@@ -19,28 +18,29 @@ public class PlayerHealth : MonoBehaviour
     public void ResetHealth()
     {
         currentHealth = maxHealth;
-        healthBar.maxValue = maxHealth;
-        healthBar.value = currentHealth;
-        // canvas = Object.FindFirstObjectByType<Canvas>();
-        // canvas = transform.Find("FPS Canvas").canvas;
-        // youDiedText = transform.Find("FPS Canvas/HealthBar").GetComponent<Slider>;
-        // youDiedText = GameObject.Find("HealthBar");
-        youDiedText.SetActive(false);
-        Invoke("CheckIfInitialized", 3.0f);
-    }
-
-    public void CheckIfInitialized()
-    {
-        if(healthBar == null)
-            Debug.Log("healthbar not found");
-        if(youDiedText == null)
-            Debug.Log("youDiedText not found");
+        
+        // Only update UI if it exists
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+        }
+        
+        if (youDiedText != null)
+        {
+            youDiedText.SetActive(false);
+        }
     }
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        healthBar.value = currentHealth;
+        
+        // Only update UI if it exists
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+        }
 
         if (currentHealth <= 0)
         {
@@ -51,7 +51,29 @@ public class PlayerHealth : MonoBehaviour
     void Die()
     {
         currentHealth = 0;
-        healthBar.value = 0;
-        youDiedText.SetActive(true);
+        
+        // Only update UI if it exists
+        if (healthBar != null)
+        {
+            healthBar.value = 0;
+        }
+        
+        if (youDiedText != null)
+        {
+            youDiedText.SetActive(true);
+        }
+        
+        Debug.Log($"{gameObject.name} has died!");
     }
-}
+    
+    // Public getter for checking health
+    public int GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+    
+    public bool IsAlive()
+    {
+        return currentHealth > 0;
+    }
+}   
