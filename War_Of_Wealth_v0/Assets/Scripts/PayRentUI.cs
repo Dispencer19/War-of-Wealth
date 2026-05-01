@@ -8,6 +8,7 @@ public class PayRentUI : MonoBehaviour
     public BoardTurns boardTurns;
     public GameMode gameMode;
     public GameObject FPSCanvas;
+    public NetworkUIManager networkUI;
 
     [Header("Fight Settings")]
     public GameObject playerPrefab; // The player prefab to spawn for fights
@@ -29,6 +30,9 @@ public class PayRentUI : MonoBehaviour
         if (boardTurns == null)
             boardTurns = FindAnyObjectByType<BoardTurns>();
         
+        if (networkUI == null)
+            networkUI = FindAnyObjectByType<NetworkUIManager>();
+        
         photonView = GetComponent<PhotonView>();
     }
 
@@ -49,6 +53,7 @@ public class PayRentUI : MonoBehaviour
 
         promptText.text = $"Pay ${rentAmount} rent to Player {ownerPlayer}?";
 
+        // Show UI locally
         gameObject.SetActive(true);
     }
 
@@ -125,18 +130,30 @@ public class PayRentUI : MonoBehaviour
 
     /// <summary>
     /// Initiates a fight between the current player and another player.
-    /// Spawns new player prefabs at the fight locations for the fight.
+    /// Teleports existing players to the fight spawn locations.
     /// </summary>
     /// <param name="opponentIndex">The index of the opponent player.</param>
     public void Fight(int opponentIndex)
     {
-        if (playerPrefab == null)
+        int currentPlayer = boardTurns.currPlayer;
+
+        // Get the current player object (already spawned in scene)
+        GameObject currentPlayerObj = GetPhotonPlayer(currentPlayer);
+        
+        // Get the opponent player object
+        GameObject opponentPlayerObj = GetPhotonPlayer(opponentIndex);
+
+        if (currentPlayerObj == null)
         {
-            Debug.LogError("Player prefab not set in PayRentUI!");
+            Debug.LogError($"Current player (index {currentPlayer}) not found in scene!");
             return;
         }
 
-        int currentPlayer = boardTurns.currPlayer;
+        if (opponentPlayerObj == null)
+        {
+            Debug.LogError($"Opponent player (index {opponentIndex}) not found in scene!");
+            return;
+        }
 
         // Get spawn positions based on player index
         Transform currentSpawn = currentPlayer == 0 ? player1FightSpawn : player2FightSpawn;
@@ -148,25 +165,38 @@ public class PayRentUI : MonoBehaviour
         Vector3 opponentSpawnPos = opponentSpawn != null ? opponentSpawn.position : Vector3.zero;
         Quaternion opponentSpawnRot = opponentSpawn != null ? opponentSpawn.rotation : Quaternion.identity;
 
-        // Spawn current player at their fight spawn (only if we own this player)
-        // Use the player prefab name from the prefab asset
-        string prefabName = playerPrefab.name;
-        GameObject currentFightPlayer = PhotonNetwork.Instantiate(prefabName, currentSpawnPos, currentSpawnRot);
-        currentFightPlayer.name = "Player" + (currentPlayer + 1) + "_Fight";
+        // Stop physics and teleport current player
+        Rigidbody currentRb = currentPlayerObj.GetComponent<Rigidbody>();
+        if (currentRb != null)
+        {
+            currentRb.linearVelocity = Vector3.zero;
+            currentRb.angularVelocity = Vector3.zero;
+        }
+        currentPlayerObj.transform.position = currentSpawnPos;
+        currentPlayerObj.transform.rotation = currentSpawnRot;
 
-        // Spawn opponent at their fight spawn
-        GameObject opponentFightPlayer = PhotonNetwork.Instantiate(prefabName, opponentSpawnPos, opponentSpawnRot);
-        opponentFightPlayer.name = "Player" + (opponentIndex + 1) + "_Fight";
+        // Stop physics and teleport opponent
+        Rigidbody opponentRb = opponentPlayerObj.GetComponent<Rigidbody>();
+        if (opponentRb != null)
+        {
+            opponentRb.linearVelocity = Vector3.zero;
+            opponentRb.angularVelocity = Vector3.zero;
+        }
+        opponentPlayerObj.transform.position = opponentSpawnPos;
+        opponentPlayerObj.transform.rotation = opponentSpawnRot;
 
         // Switch to FPS mode (all clients)
         gameMode.buttonSwitchGameMode();
 
-        // Hide fight UI and show FPS canvas
-        if (fightUI != null)
-            fightUI.SetActive(false);
-        if (FPSCanvas != null)
-            FPSCanvas.SetActive(true);
+        // Hide fight UI and show FPS canvas for all players via network sync
+        if (photonView.IsMine)
+        {
+            if (fightUI != null)
+                networkUI.HideUISynced(fightUI.name);
+            if (FPSCanvas != null)
+                networkUI.ShowUISynced(FPSCanvas.name);
+        }
 
-        Debug.Log($"Fight started - spawned Player {currentPlayer + 1} and Player {opponentIndex + 1} at fight locations");
+        Debug.Log($"Fight started - teleported Player {currentPlayer + 1} and Player {opponentIndex + 1} to fight locations");
     }
 }

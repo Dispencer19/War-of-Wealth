@@ -2,11 +2,13 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 
 public class BoardTurns : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] BoardVariables boardVariables;
+    [SerializeField] NetworkUIManager networkUI;
 
     [SerializeField] TextMeshProUGUI currentPlayerStats;
     [SerializeField] TextMeshProUGUI diceRollResultText;
@@ -28,18 +30,30 @@ public class BoardTurns : MonoBehaviour
 
     bool isMoving = false;
 
+    private PhotonView photonView;
+
     void Start()
     {
         if (boardVariables == null)
             boardVariables = GetComponent<BoardVariables>();
+        
+        photonView = GetComponent<PhotonView>();
+        
+        if (networkUI == null)
+            networkUI = FindAnyObjectByType<NetworkUIManager>();
     }
 
     public void BoardTurnButton()
     {
+        // Only the current player can roll
+        if (!photonView.IsMine)
+            return;
+            
         if (isMoving) return;
 
         StartCoroutine(diceRoller.RollDice(result =>
         {
+            // Update dice roll result locally
             diceRollResultText.text = $"Rolled a {result}!";
 
             StartCoroutine(MovePlayer(currPlayer, result));
@@ -97,6 +111,10 @@ public class BoardTurns : MonoBehaviour
 
     void Update()
     {
+        // Only update UI for local player
+        if (!photonView.IsMine)
+            return;
+            
         if (playerGameObjects.Length == 0) return;
 
         PlayerBankAccounts bank =

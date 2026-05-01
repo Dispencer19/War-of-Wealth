@@ -1,4 +1,5 @@
 using UnityEngine;
+using Photon.Pun;
 
 public class ChanceCard : MonoBehaviour
 {
@@ -9,6 +10,17 @@ public class ChanceCard : MonoBehaviour
 
     public GameObject ChanceCardUI; // UI panel to show card details (optional)
     public GameObject endTurnUI; // UI panel for end turn options (optional)
+
+    public NetworkUIManager networkUI;
+
+    private PhotonView photonView;
+
+    private void Awake()
+    {
+        photonView = GetComponent<PhotonView>();
+        if (networkUI == null)
+            networkUI = FindAnyObjectByType<NetworkUIManager>();
+    }
 
     public void DrawCard()
     {
@@ -41,8 +53,11 @@ public class ChanceCard : MonoBehaviour
             // TODO: integrate with your money system
         }
 
-        // After drawing, show End Turn UI
-        ChanceCardUI.SetActive(false); // Hide card UI
-        endTurnUI.SetActive(true);
+        // After drawing, show End Turn UI for all players
+        if (photonView.IsMine)
+        {
+            networkUI.HideUISynced(ChanceCardUI.name);
+            networkUI.ShowUISynced(endTurnUI.name);
+        }
     }
 }

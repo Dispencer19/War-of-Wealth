@@ -1,4 +1,5 @@
 using UnityEngine;
+using Photon.Pun;
 
 public class FightTeleport : MonoBehaviour
 {
@@ -10,6 +11,13 @@ public class FightTeleport : MonoBehaviour
 
     public PlayerHealth player1Health;
     public PlayerHealth player2Health;
+
+    private PhotonView photonView;
+
+    private void Awake() 
+    {
+        photonView = GetComponent<PhotonView>();
+    }
 
     private void Start()     
     {
@@ -33,8 +41,26 @@ public class FightTeleport : MonoBehaviour
             Debug.Log("player2 was not found during start of fightteleport");
     }
 
+    [PunRPC]
+    public void RPC_StartFight()
+    {
+        StartFightInternal();
+    }
+
     public void StartFight()
     {
+        // Call RPC on all clients
+        photonView.RPC("RPC_StartFight", RpcTarget.All);
+    }
+
+    private void StartFightInternal()
+    {
+        if (player1 == null || player2 == null)
+        {
+            Debug.LogError("Players not found!");
+            return;
+        }
+
         // Stop physics movement
         Rigidbody rb1 = player1.GetComponent<Rigidbody>();
         Rigidbody rb2 = player2.GetComponent<Rigidbody>();
@@ -47,7 +73,9 @@ public class FightTeleport : MonoBehaviour
         player2.position = player2Spawn.position;
 
         // Reset health
-        player1Health.ResetHealth();
-        player2Health.ResetHealth();
+        if (player1Health != null)
+            player1Health.ResetHealth();
+        if (player2Health != null)
+            player2Health.ResetHealth();
     }
 }

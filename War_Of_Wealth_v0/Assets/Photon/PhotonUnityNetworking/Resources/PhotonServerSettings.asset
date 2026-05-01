@@ -40,6 +40,17 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - TeleportPlayer
+  - RPC_AddMoney
+  - RPC_AddProperty
+  - RPC_EnterShootingRange
+  - RPC_HideUI
+  - RPC_RemoveMoney
+  - RPC_RemoveProperty
+  - RPC_ShowUI
+  - RPC_StartFight
+  - RPC_SwitchGameMode
+  - RPC_TakeDamage
+  - RPC_UpdateUIText
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
 public class GameMode : MonoBehaviour
 {
@@ -7,9 +8,18 @@ public class GameMode : MonoBehaviour
     [SerializeField] DisableFPS disableFPS;
     [SerializeField] GameObject boardEmpty;
 
+    [SerializeField] public NetworkUIManager networkUI;
+
+    private PhotonView photonView;
+
     void Start()
     {
+        photonView = GetComponent<PhotonView>();
         disableFPS = DisableFPS.FindFirstObjectByType<DisableFPS>();
+        
+        if (networkUI == null)
+            networkUI = FindAnyObjectByType<NetworkUIManager>();
+
         if(!isFPSMode)
         {
             disableFPS.DisableFPSObjects();
@@ -26,8 +36,20 @@ public class GameMode : MonoBehaviour
         //if (Keyboard.current.gKey.wasPressedThisFrame)
     }
 
+    [PunRPC]
+    public void RPC_SwitchGameMode()
+    {
+        SwitchGameModeInternal();
+    }
+
     // switch to other game mode
     public void buttonSwitchGameMode()
+    {
+        // Call RPC on all clients to sync game mode
+        photonView.RPC("RPC_SwitchGameMode", RpcTarget.All);
+    }
+
+    private void SwitchGameModeInternal()
     {
         if (!isFPSMode)
         {

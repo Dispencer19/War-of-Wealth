@@ -1,57 +1,81 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Photon.Pun;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("Health Settings")]
     public int maxHealth = 200;
-    private int currentHealth;
+    public int currentHealth;
 
+    [Header("UI References")]
     public Slider healthBar;
-    // public Canvas canvas;
     public GameObject youDiedText;
+
+    [Header("Network")]
+    private PhotonView photonView;
 
     void Start()
     {
+        photonView = GetComponent<PhotonView>();
         ResetHealth();
     }
 
     public void ResetHealth()
     {
         currentHealth = maxHealth;
-        healthBar.maxValue = maxHealth;
-        healthBar.value = currentHealth;
-        // canvas = Object.FindFirstObjectByType<Canvas>();
-        // canvas = transform.Find("FPS Canvas").canvas;
-        // youDiedText = transform.Find("FPS Canvas/HealthBar").GetComponent<Slider>;
-        // youDiedText = GameObject.Find("HealthBar");
-        youDiedText.SetActive(false);
-        Invoke("CheckIfInitialized", 3.0f);
+        
+        // Only update local player's health bar
+        if (photonView.IsMine)
+        {
+            if (healthBar != null)
+            {
+                healthBar.maxValue = maxHealth;
+                healthBar.value = currentHealth;
+            }
+            if (youDiedText != null)
+                youDiedText.SetActive(false);
+        }
     }
 
-    public void CheckIfInitialized()
+    [PunRPC]
+    public void RPC_TakeDamage(int damage)
     {
-        if(healthBar == null)
-            Debug.Log("healthbar not found");
-        if(youDiedText == null)
-            Debug.Log("youDiedText not found");
+        currentHealth -= damage;
+
+        // Only update local player's health bar
+        if (photonView.IsMine)
+        {
+            if (healthBar != null)
+                healthBar.value = currentHealth;
+
+            if (currentHealth <= 0)
+            {
+                Die();
+            }
+        }
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
-        healthBar.value = currentHealth;
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        // Call RPC to sync damage across network
+        photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
     }
 
     void Die()
     {
         currentHealth = 0;
-        healthBar.value = 0;
-        youDiedText.SetActive(true);
+        
+        // Only show death UI for local player
+        if (photonView.IsMine)
+        {
+            if (healthBar != null)
+                healthBar.value = 0;
+            if (youDiedText != null)
+                youDiedText.SetActive(true);
+        }
     }
 }
+
+    

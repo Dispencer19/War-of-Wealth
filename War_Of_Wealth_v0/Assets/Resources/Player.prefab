@@ -92,7 +92,6 @@ GameObject:
   - component: {fileID: 4907977546980238207}
   - component: {fileID: 5533192338418402191}
   - component: {fileID: 2401843851317142546}
-  - component: {fileID: 3553987205367805680}
   - component: {fileID: 8790075717160640154}
   m_Layer: 0
   m_Name: Player
@@ -295,26 +294,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 200
+  currentHealth: 0
   healthBar: {fileID: 0}
   youDiedText: {fileID: 0}
---- !u!114 &3553987205367805680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5096507742717803388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 166394aab28db49139468a922bf5e6ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FightTeleport
-  player1: {fileID: 0}
-  player2: {fileID: 0}
-  player1Spawn: {fileID: 0}
-  player2Spawn: {fileID: 0}
-  player1Health: {fileID: 0}
-  player2Health: {fileID: 0}
 --- !u!114 &8790075717160640154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -335,8 +317,8 @@ MonoBehaviour:
   playerHeight: 2
   whatIsGround:
     serializedVersion: 2
-    m_Bits: 0
-  orientation: {fileID: 0}
+    m_Bits: 64
+  orientation: {fileID: 2882704549845672912}
   canMove: 1
 --- !u!1 &5850131409480117144
 GameObject:

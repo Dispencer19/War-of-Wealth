@@ -2,6 +2,7 @@ using Unity.Multiplayer.PlayMode;
 using Unity.VisualScripting;
 //using UnityEditor.Build.Content;
 using UnityEngine;
+using Photon.Pun;
 
 public class TileEffects : MonoBehaviour
 {
@@ -28,16 +29,33 @@ public class TileEffects : MonoBehaviour
     [SerializeField] public BoardTurns boardTurns;
 
     [SerializeField] public GameObject AimChallengeUI;
+
+    [SerializeField] public NetworkUIManager networkUI;
+
+    private PhotonView photonView;
+
+    private void Awake()
+    {
+        photonView = GetComponent<PhotonView>();
+        if (networkUI == null)
+            networkUI = FindAnyObjectByType<NetworkUIManager>();
+    }
     
     public void BuyProperty(BoardSpace space)
     {
-        StartTurnUI.SetActive(false);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
         if (space.isOwned)
         {
             Debug.Log("This property is already owned by Player " + space.ownerPlayerIndex);
             return;
         }
-        BuyPropertyUI.SetActive(true);
+
+        // Show buy property UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(BuyPropertyUI.name);
 
         var ui = BuyPropertyUI.GetComponent<BuyPropertyUI>();
 
@@ -46,7 +64,10 @@ public class TileEffects : MonoBehaviour
 
     public void PayRent(BoardSpace space)
     {
-        StartTurnUI.SetActive(false);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
         if (!space.isOwned)
         {
             Debug.Log("This property is not owned. No rent to pay.");
@@ -56,6 +77,10 @@ public class TileEffects : MonoBehaviour
         {
             Debug.Log("This property is owned by Player " + space.ownerPlayerIndex + ". Player must pay rent of " + space.rent);
         }
+
+        // Show pay rent UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(PayRentUI.name);
         
         var ui = PayRentUI.GetComponent<PayRentUI>();
         ui.Show(space, boardTurns.currPlayer);
@@ -63,55 +88,101 @@ public class TileEffects : MonoBehaviour
 
     public void PassGo()
     {
-        StartTurnUI.SetActive(false);
-        PassGoUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show pass go UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(PassGoUI.name);
     }
 
     public void ChanceCard()
     {
-        StartTurnUI.SetActive(false);   
-        ChanceCardUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show chance card UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(ChanceCardUI.name);
     }
     
     public void CommunityChestCard()
     {
-        StartTurnUI.SetActive(false);
-        CommunityChestCardUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show community chest UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(CommunityChestCardUI.name);
     }
 
     public void GoToJail()
     {
-        StartTurnUI.SetActive(false);
-        EndTurnUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show end turn UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(EndTurnUI.name);
     }   
 
     public void FreeParking()
     {
-        StartTurnUI.SetActive(false);
-        EndTurnUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show end turn UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(EndTurnUI.name);
     }
 
     public void Battle()
     {
-        StartTurnUI.SetActive(false);
-        BattleUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show battle UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(BattleUI.name);
     }
 
     public void InJail()
     {
-        StartTurnUI.SetActive(false);
-        InJailUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show in jail UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(InJailUI.name);
     }
 
     public void JustVisiting()
     {
-        StartTurnUI.SetActive(false);
-        EndTurnUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show end turn UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(EndTurnUI.name);
     }
 
     public void AimChallenge()
     {
-        StartTurnUI.SetActive(false);
-        AimChallengeUI.SetActive(true);
+        // Hide start turn UI for all
+        if (photonView.IsMine)
+            networkUI.HideUISynced(StartTurnUI.name);
+
+        // Show aim challenge UI for all
+        if (photonView.IsMine)
+            networkUI.ShowUISynced(AimChallengeUI.name);
     }
 }
+       
