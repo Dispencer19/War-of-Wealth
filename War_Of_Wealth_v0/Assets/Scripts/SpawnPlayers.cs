@@ -1,6 +1,4 @@
 using UnityEngine;
-using Photon.Pun;
-using Photon.Realtime;
 
 public class SpawnPlayers : MonoBehaviour
 {
@@ -20,12 +18,5 @@ public class SpawnPlayers : MonoBehaviour
             Random.Range(minZ, maxZ)
         );
 
-        // Instantiate the player
-        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
-
-        // Assign name based on join order
-        int playerNumber = PhotonNetwork.CurrentRoom.PlayerCount;
-        player.name = "Player" + playerNumber;
-        Debug.Log("Spawned player: "+player.name);
     }
 }

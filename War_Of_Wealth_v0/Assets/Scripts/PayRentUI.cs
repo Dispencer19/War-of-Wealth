@@ -1,5 +1,4 @@
 using UnityEngine;
-using Photon.Pun;
 using TMPro;
 
 public class PayRentUI : MonoBehaviour
@@ -19,7 +18,6 @@ public class PayRentUI : MonoBehaviour
     public TextMeshProUGUI promptText;
     public GameObject EndTurnUI;
 
-    private PhotonView photonView;
     private BoardSpace currentSpace;
     private int currentPlayerIndex;
 
@@ -29,7 +27,6 @@ public class PayRentUI : MonoBehaviour
         if (boardTurns == null)
             boardTurns = FindAnyObjectByType<BoardTurns>();
         
-        photonView = GetComponent<PhotonView>();
     }
 
     // Update is called once per frame
@@ -151,12 +148,9 @@ public class PayRentUI : MonoBehaviour
         // Spawn current player at their fight spawn (only if we own this player)
         // Use the player prefab name from the prefab asset
         string prefabName = playerPrefab.name;
-        GameObject currentFightPlayer = PhotonNetwork.Instantiate(prefabName, currentSpawnPos, currentSpawnRot);
-        currentFightPlayer.name = "Player" + (currentPlayer + 1) + "_Fight";
+
 
         // Spawn opponent at their fight spawn
-        GameObject opponentFightPlayer = PhotonNetwork.Instantiate(prefabName, opponentSpawnPos, opponentSpawnRot);
-        opponentFightPlayer.name = "Player" + (opponentIndex + 1) + "_Fight";
 
         // Switch to FPS mode (all clients)
         gameMode.buttonSwitchGameMode();

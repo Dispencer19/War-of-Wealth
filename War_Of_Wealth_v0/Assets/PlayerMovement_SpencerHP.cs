@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Photon.Pun;
 
 public class PlayerMovement_SpencerHP : MonoBehaviour
 {
@@ -31,13 +30,11 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
     private Vector3 moveDirection;
     private Rigidbody rb;
 
-    PhotonView view;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        view = GetComponent<PhotonView>();
         orientation = transform.Find("Orientation");
     }
 
@@ -60,19 +57,6 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
             whatIsGround
         );
 
-        if (view.IsMine)
-        {
-            ReadInput();
-            ControlDrag();
-
-            // Jump input (Space)
-            if (Keyboard.current.spaceKey.wasPressedThisFrame && grounded && readyToJump)
-            {
-                readyToJump = false;
-                Jump();
-                Invoke(nameof(ResetJump), jumpCooldown);
-            }
-        }
     }
 
     private void FixedUpdate()
@@ -124,7 +108,6 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
         rb.linearDamping = grounded ? groundDrag : 0f; // linearDamping → drag
     }
 
-    [PunRPC]
     public void TeleportPlayer(Vector3 position, Quaternion rotation)
     {
         // Stop physics movement
