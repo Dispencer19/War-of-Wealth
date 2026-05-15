@@ -1,4 +1,4 @@
-using GLTFast.Schema;
+
 using UnityEngine;
 using UnityEngine.Events;
 

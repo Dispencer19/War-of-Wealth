@@ -2,90 +2,78 @@ using UnityEngine;
 
 public class FightTeleport : MonoBehaviour
 {
-    public Transform player1;
-    public Transform player2;
+    [Header("Fight Settings")]
+    [SerializeField] private int player1Index = 0;
+    [SerializeField] private int player2Index = 1;
 
-    public Transform player1Spawn;
-    public Transform player2Spawn;
+    [Header("Spawn Points")]
+    [SerializeField] private Transform player1Spawn;
+    [SerializeField] private Transform player2Spawn;
 
-    public PlayerHealth player1Health;
-    public PlayerHealth player2Health;
-
-    void Start()
+    private void Start()
     {
-        // Don't try to find players immediately - they might not exist yet
-        // Instead, find spawn points (they exist in the scene from the start)
-        
-        GameObject spawn1 = GameObject.Find("Player1FightSpawn");
-        if (spawn1 != null)
-            player1Spawn = spawn1.transform;
-        else
-            Debug.LogWarning("Player1FightSpawn not found in scene!");
-            
-        GameObject spawn2 = GameObject.Find("Player2FightSpawn");
-        if (spawn2 != null)
-            player2Spawn = spawn2.transform;
-        else
-            Debug.LogWarning("Player2FightSpawn not found in scene!");
+        // Find spawn points by name if not assigned
+        if (player1Spawn == null)
+        {
+            GameObject spawn1 = GameObject.Find("Player1FightSpawn");
+            if (spawn1 != null) player1Spawn = spawn1.transform;
+        }
+
+        if (player2Spawn == null)
+        {
+            GameObject spawn2 = GameObject.Find("Player2FightSpawn");
+            if (spawn2 != null) player2Spawn = spawn2.transform;
+        }
     }
 
     public void StartFight()
     {
-        // Find players when the fight actually starts (not in Start())
-        // This ensures they've been spawned by Photon first
-        
-        GameObject p1 = GameObject.Find("Player1");
-        GameObject p2 = GameObject.Find("Player2");
-        
-        // Check if players exist
-        if (p1 == null)
+        // Check if PlayerManager exists
+        if (PlayerManager.Instance == null)
         {
-            Debug.LogError("Cannot start fight - Player1 not found!");
+            Debug.LogError("PlayerManager not found! Cannot start fight.");
             return;
         }
-        
-        if (p2 == null)
+
+        // Validate player indices
+        if (player1Index >= PlayerManager.Instance.GetPlayerCount() ||
+            player2Index >= PlayerManager.Instance.GetPlayerCount())
         {
-            Debug.LogError("Cannot start fight - Player2 not found!");
+            Debug.LogError($"Invalid player indices for fight: {player1Index}, {player2Index}. Only {PlayerManager.Instance.GetPlayerCount()} players available.");
             return;
         }
-        
-        // Check if spawn points exist
+
+        // Check spawn points
         if (player1Spawn == null || player2Spawn == null)
         {
-            Debug.LogError("Cannot start fight - spawn points not set!");
+            Debug.LogError("Fight spawn points not set!");
             return;
         }
-        
-        // Now we know everything exists, safe to proceed
-        player1 = p1.transform;
-        player2 = p2.transform;
-        
-        player1Health = player1.GetComponent<PlayerHealth>();
-        player2Health = player2.GetComponent<PlayerHealth>();
 
-        // Stop physics movement
-        Rigidbody rb1 = player1.GetComponent<Rigidbody>();
-        Rigidbody rb2 = player2.GetComponent<Rigidbody>();
+        // Teleport players using PlayerManager
+        PlayerManager.Instance.TeleportPlayer(player1Index, player1Spawn.position, player1Spawn.rotation);
+        PlayerManager.Instance.TeleportPlayer(player2Index, player2Spawn.position, player2Spawn.rotation);
 
-        if (rb1 != null) rb1.linearVelocity = Vector3.zero;
-        if (rb2 != null) rb2.linearVelocity = Vector3.zero;
-
-        // Teleport players
-        player1.position = player1Spawn.position;
-        player2.position = player2Spawn.position;
+        // Disable player movement during fight
+        PlayerManager.Instance.DisablePlayerMovement(player1Index);
+        PlayerManager.Instance.DisablePlayerMovement(player2Index);
 
         // Reset health
-        if (player1Health != null)
-            player1Health.ResetHealth();
-        else
-            Debug.LogWarning("Player1 has no PlayerHealth component!");
-            
-        if (player2Health != null)
-            player2Health.ResetHealth();
-        else
-            Debug.LogWarning("Player2 has no PlayerHealth component!");
-            
-        Debug.Log("Fight started successfully!");
+        PlayerManager.Instance.ResetPlayerHealth(player1Index);
+        PlayerManager.Instance.ResetPlayerHealth(player2Index);
+
+        Debug.Log($"Fight started between Player {player1Index + 1} and Player {player2Index + 1}!");
+    }
+
+    public void EndFight()
+    {
+        // Re-enable player movement
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.EnablePlayerMovement(player1Index);
+            PlayerManager.Instance.EnablePlayerMovement(player2Index);
+        }
+
+        Debug.Log("Fight ended - player movement restored");
     }
 }

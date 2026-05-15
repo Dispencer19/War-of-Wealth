@@ -3,75 +3,132 @@ using System.Collections;
 
 public class ShootingRangeManager_SpencerHP : MonoBehaviour
 {
-    [Header("Player")]
-    public Transform player1;
-    public Transform shootingRangeSpawn;
-    public PlayerMovement_SpencerHP playerMovement;
+    [Header("Player Settings")]
+    [SerializeField] private int playerIndex = 0; // Which player enters the range
 
     [Header("Environment")]
-    public float backgroundDistance = 15f;
-    public Transform backWall;
+    [SerializeField] private Transform shootingRangeSpawn;
+    [SerializeField] private float backgroundDistance = 15f;
+    [SerializeField] private Transform backWall;
 
     [Header("UI / Mode")]
-    public GameMode gameMode;
-    public GameObject AimChallengeUI;
-    public GameObject FPSCanvas;
-    public GameObject StatsUI;
+    [SerializeField] private GameMode gameMode;
+    [SerializeField] private GameObject AimChallengeUI;
+    [SerializeField] private GameObject FPSCanvas;
+    [SerializeField] private GameObject StatsUI;
 
     [Header("Target Spawning")]
-    public GameObject targetPrefab;
-    public Transform spawnStart;
-    public Transform spawnEnd;
+    [SerializeField] private GameObject targetPrefab;
+    [SerializeField] private Transform spawnStart;
+    [SerializeField] private Transform spawnEnd;
 
-    public float spawnInterval = 1.5f;
-    public int maxTargets = 10;
+    [SerializeField] private float spawnInterval = 1.5f;
+    [SerializeField] private int maxTargets = 10;
 
     private bool spawning = false;
+    private bool inRange = false;
+
+    private void Start()
+    {
+        if (gameMode == null)
+            gameMode = FindFirstObjectByType<GameMode>();
+    }
 
     public void EnterShootingRange()
     {
-        // teleport player
-        player1.position = shootingRangeSpawn.position;
-        player1.rotation = shootingRangeSpawn.rotation;
+        if (PlayerManager.Instance == null)
+        {
+            Debug.LogError("PlayerManager not found!");
+            return;
+        }
 
-        // disable movement
-        playerMovement.canMove = false;
+        if (playerIndex >= PlayerManager.Instance.GetPlayerCount())
+        {
+            Debug.LogError($"Invalid player index {playerIndex}. Only {PlayerManager.Instance.GetPlayerCount()} players available.");
+            return;
+        }
 
-        // adjust environment
-        backWall.localPosition = new Vector3(0, 0, backgroundDistance);
+        // Teleport player to range
+        if (shootingRangeSpawn != null)
+        {
+            PlayerManager.Instance.TeleportPlayer(playerIndex, shootingRangeSpawn.position, shootingRangeSpawn.rotation);
+        }
 
-        // switch modes/UI
-        gameMode.buttonSwitchGameMode();
-        AimChallengeUI.SetActive(false);
-        StatsUI.SetActive(false);
-        FPSCanvas.SetActive(true);
+        // Disable movement
+        PlayerManager.Instance.DisablePlayerMovement(playerIndex);
 
-        // start spawning targets
+        // Adjust environment
+        if (backWall != null)
+        {
+            backWall.localPosition = new Vector3(0, 0, backgroundDistance);
+        }
+
+        // Switch to FPS mode
+        if (gameMode != null)
+        {
+            gameMode.buttonSwitchGameMode();
+        }
+
+        // Update UI
+        if (AimChallengeUI != null) AimChallengeUI.SetActive(false);
+        if (StatsUI != null) StatsUI.SetActive(false);
+        if (FPSCanvas != null) FPSCanvas.SetActive(true);
+
+        inRange = true;
+
+        // Start spawning targets
         StartCoroutine(SpawnTargets());
     }
 
-    IEnumerator SpawnTargets()
+    public void ExitShootingRange()
+    {
+        if (!inRange) return;
+
+        // Re-enable movement
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.EnablePlayerMovement(playerIndex);
+        }
+
+        // Switch back to board mode
+        if (gameMode != null)
+        {
+            gameMode.buttonSwitchGameMode();
+        }
+
+        // Update UI
+        if (AimChallengeUI != null) AimChallengeUI.SetActive(true);
+        if (StatsUI != null) StatsUI.SetActive(true);
+        if (FPSCanvas != null) FPSCanvas.SetActive(false);
+
+        // Stop spawning
+        StopAllCoroutines();
+        spawning = false;
+        inRange = false;
+
+        Debug.Log($"Player {playerIndex + 1} exited shooting range");
+    }
+
+    private IEnumerator SpawnTargets()
     {
         spawning = true;
 
-        int spawned = 0;
-
-        while (spawning && spawned < maxTargets)
+        for (int i = 0; i < maxTargets; i++)
         {
-            Vector3 spawnPos = Vector3.Lerp(
-                spawnStart.position,
-                spawnEnd.position,
-                Random.Range(0f, 1f)
-            );
+            if (!spawning) break;
 
-            GameObject target = Instantiate(targetPrefab, spawnPos, Quaternion.identity);
-
-            // optional: face player
-            target.transform.LookAt(player1);
-
-            spawned++;
+            // Spawn target at random position between start and end
+            if (targetPrefab != null && spawnStart != null && spawnEnd != null)
+            {
+                Vector3 spawnPos = Vector3.Lerp(spawnStart.position, spawnEnd.position, Random.value);
+                Instantiate(targetPrefab, spawnPos, Quaternion.identity);
+            }
 
             yield return new WaitForSeconds(spawnInterval);
         }
+
+        spawning = false;
     }
+
+    
 }

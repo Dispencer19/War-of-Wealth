@@ -10,11 +10,11 @@ public class BuyPropertyUI : MonoBehaviour
 
     private BoardSpace currentSpace;
     private int currentPlayerIndex;
-    private BoardTurns boardTurns;
+    private DisableFPS disableFPS;
 
     private void Awake()
     {
-        boardTurns = FindObjectOfType<BoardTurns>();
+        disableFPS = FindAnyObjectByType<DisableFPS>();
     }
 
     // Called when a player lands on a property
@@ -44,7 +44,7 @@ public class BuyPropertyUI : MonoBehaviour
         //Debug.Log("Player bought " + currentSpace.spaceName);
 
         // Get the player's bank account
-        PlayerBankAccounts bank = boardTurns.playerGameObjects[currentPlayerIndex]
+        PlayerBankAccounts bank = disableFPS.playerObjects[currentPlayerIndex]
             .GetComponent<PlayerBankAccounts>();
 
         // Deduct money

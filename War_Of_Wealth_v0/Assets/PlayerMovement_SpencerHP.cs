@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class PlayerMovement_SpencerHP : MonoBehaviour
 {
@@ -24,12 +25,14 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
     [Header("Status")]
     public bool canMove = true; // moved inside the class
 
+    [Header("Player Input")]
+    [SerializeField] public int playerIndex = 0; // 0 for player 1, 1 for player 2, etc.
+
     private float horizontalInput;
     private float verticalInput;
 
     private Vector3 moveDirection;
     private Rigidbody rb;
-
 
     private void Start()
     {
@@ -57,6 +60,20 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
             whatIsGround
         );
 
+        ReadInput();
+        ControlDrag();
+
+        // Jump input based on player index
+        if (grounded && readyToJump)
+        {
+            if ((playerIndex == 0 && Keyboard.current.spaceKey.wasPressedThisFrame) ||
+                (playerIndex == 1 && Keyboard.current.enterKey.wasPressedThisFrame))
+            {
+                readyToJump = false;
+                Jump();
+                Invoke(nameof(ResetJump), jumpCooldown);
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -68,13 +85,28 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
     {
         if (Keyboard.current == null) return;
 
-        horizontalInput =
-            (Keyboard.current.dKey.isPressed ? 1 : 0) -
-            (Keyboard.current.aKey.isPressed ? 1 : 0);
+        if (playerIndex == 0)
+        {
+            // Player 1: WASD
+            horizontalInput =
+                (Keyboard.current.dKey.isPressed ? 1 : 0) -
+                (Keyboard.current.aKey.isPressed ? 1 : 0);
 
-        verticalInput =
-            (Keyboard.current.wKey.isPressed ? 1 : 0) -
-            (Keyboard.current.sKey.isPressed ? 1 : 0);
+            verticalInput =
+                (Keyboard.current.wKey.isPressed ? 1 : 0) -
+                (Keyboard.current.sKey.isPressed ? 1 : 0);
+        }
+        else if (playerIndex == 1)
+        {
+            // Player 2: Arrow keys
+            horizontalInput =
+                (Keyboard.current.rightArrowKey.isPressed ? 1 : 0) -
+                (Keyboard.current.leftArrowKey.isPressed ? 1 : 0);
+
+            verticalInput =
+                (Keyboard.current.upArrowKey.isPressed ? 1 : 0) -
+                (Keyboard.current.downArrowKey.isPressed ? 1 : 0);
+        }
     }
 
     private void MovePlayer()

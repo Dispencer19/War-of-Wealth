@@ -12,8 +12,10 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] TextMeshProUGUI diceRollResultText;
     [SerializeField] TextMeshProUGUI currentplayerMoney;
 
-    [SerializeField] GameObject StartTurnButton;   
-    [SerializeField] GameObject EndTurnUI;     
+    public GameObject[] playerGameObjects;
+
+    [SerializeField] GameObject StartTurnButton;
+    [SerializeField] GameObject EndTurnUI;
 
     public DiceRoller diceRoller;
 
@@ -21,25 +23,36 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] float moveSpeed = 12f;
     [SerializeField] float stepPause = 0.1f;
 
-    [Header("Players")]
-    public GameObject[] playerGameObjects;
+    [Header("Board")]
     public BoardSpace[] boardSpaces;
-    public int[] playerLocations;
-
-    public int currPlayer = 0;
     public int numTotalLocations = 40;
 
-    bool isMoving = false;
+    // Player state management
+    public int[] playerLocations;
+    public int currPlayer = 0;
+    private bool isMoving = false;
 
     void Start()
     {
         if (boardVariables == null)
             boardVariables = GetComponent<BoardVariables>();
+
+        // Initialize player locations array
+        int playerCount = PlayerManager.Instance != null ? PlayerManager.Instance.GetPlayerCount() : 0;
+        playerLocations = new int[playerCount];
+
+        Debug.Log($"BoardTurns initialized for {playerCount} players");
     }
 
     public void BoardTurnButton()
     {
         if (isMoving) return;
+
+        if (diceRoller == null)
+        {
+            Debug.LogError("DiceRoller not assigned!");
+            return;
+        }
 
         StartCoroutine(diceRoller.RollDice(result =>
         {
@@ -53,7 +66,27 @@ public class BoardTurns : MonoBehaviour
     {
         isMoving = true;
 
+        if (PlayerManager.Instance == null)
+        {
+            Debug.LogError("PlayerManager not found!");
+            isMoving = false;
+            yield break;
+        }
+
+        if (playerLocations == null || playerIndex >= playerLocations.Length)
+        {
+            Debug.LogError($"Invalid player index {playerIndex} or playerLocations not initialized");
+            isMoving = false;
+            yield break;
+        }
+
         GameObject player = playerGameObjects[playerIndex];
+        if (player == null)
+        {
+            Debug.LogError($"Player {playerIndex} not found!");
+            isMoving = false;
+            yield break;
+        }
 
         for (int i = 0; i < steps; i++)
         {
@@ -84,8 +117,15 @@ public class BoardTurns : MonoBehaviour
         }
 
         // land on final tile
-        BoardSpace landedSpace = boardSpaces[playerLocations[playerIndex]];
-        landedSpace.Land(playerIndex);
+        if (boardSpaces != null && playerLocations[playerIndex] < boardSpaces.Length)
+        {
+            BoardSpace landedSpace = boardSpaces[playerLocations[playerIndex]];
+            landedSpace.Land(playerIndex);
+        }
+        else
+        {
+            Debug.LogError($"Invalid board space at location {playerLocations[playerIndex]}");
+        }
 
         isMoving = false;
     }
@@ -94,31 +134,38 @@ public class BoardTurns : MonoBehaviour
     {
         isMoving = false;
 
-        currPlayer = (currPlayer + 1) % playerGameObjects.Length;
+        if (PlayerManager.Instance == null)
+        {
+            Debug.LogError("PlayerManager not found!");
+            return;
+        }
+
+        currPlayer = (currPlayer + 1) % PlayerManager.Instance.GetPlayerCount();
         Debug.Log($"Player {currPlayer + 1}'s turn");
 
         // Update UI for next player
         EndTurnUI.SetActive(false);
         StartTurnButton.SetActive(true);
-
     }
 
     void Update()
     {
-        if (playerGameObjects.Length == 0) return;
+        if (PlayerManager.Instance == null || PlayerManager.Instance.GetPlayerCount() == 0) return;
 
-        PlayerBankAccounts bank =
-            playerGameObjects[currPlayer].GetComponent<PlayerBankAccounts>();
+        PlayerBankAccounts bank = PlayerManager.Instance.GetPlayerBank(currPlayer);
 
         int money = bank != null ? bank.currentBalance : 0;
 
         List<string> ownedProperties = new List<string>();
 
-        for (int i = 0; i < boardSpaces.Length; i++)
+        if (boardSpaces != null)
         {
-            if (boardSpaces[i].ownerPlayerIndex == currPlayer)
+            for (int i = 0; i < boardSpaces.Length; i++)
             {
-                ownedProperties.Add(boardSpaces[i].spaceName);
+                if (boardSpaces[i] != null && boardSpaces[i].ownerPlayerIndex == currPlayer)
+                {
+                    ownedProperties.Add(boardSpaces[i].spaceName);
+                }
             }
         }
 
@@ -127,9 +174,14 @@ public class BoardTurns : MonoBehaviour
             ? "\nProperties: " + string.Join(", ", ownedProperties)
             : "\nNo properties owned";
 
-        currentPlayerStats.text =
-            $"Player {currPlayer + 1}'s turn{propertiesText}";
+        if (currentPlayerStats != null)
+        {
+            currentPlayerStats.text = $"Player {currPlayer + 1}'s turn{propertiesText}";
+        }
 
-        currentplayerMoney.text = $"${money}";
+        if (currentplayerMoney != null)
+        {
+            currentplayerMoney.text = $"${money}";
+        }
     }
 }

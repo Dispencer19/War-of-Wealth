@@ -19,14 +19,13 @@ public class PayRentUI : MonoBehaviour
     public GameObject EndTurnUI;
 
     private BoardSpace currentSpace;
-    private int currentPlayerIndex;
+    public int currentPlayerIndex;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         if (boardTurns == null)
             boardTurns = FindAnyObjectByType<BoardTurns>();
-        
     }
 
     // Update is called once per frame
@@ -75,17 +74,13 @@ public class PayRentUI : MonoBehaviour
     }
 
 
-    // Helper method to get the actual Photon-spawned player by name (Player1, Player2, etc.)
-    private GameObject GetPhotonPlayer(int playerIndex)
+    // Helper method to get the player by index
+    private GameObject GetPlayer(int playerIndex)
     {
-        string playerName = "Player" + (playerIndex + 1); // playerIndex is 0-based, so add 1
-        return GameObject.Find(playerName);
+        return PlayerManager.Instance.GetPlayer(playerIndex);
     }
 
-    /// <summary>
-    /// Pays rent from the current player to the owner of the space they landed on.
-    /// </summary>
-    /// <param name="space">The BoardSpace that the current player landed on.</param>
+    
     public void PayRent(BoardSpace space)
     {
         if (space == null || !space.isOwned)
@@ -100,12 +95,12 @@ public class PayRentUI : MonoBehaviour
 
         int rentAmount = space.rent;
 
-        // Get the current player's bank account using Photon-spawned player
-        GameObject currentPlayerObj = GetPhotonPlayer(currentPlayer);
+        // Get the current player's bank account using player
+        GameObject currentPlayerObj = GetPlayer(currentPlayer);
         PlayerBankAccounts currentBank = currentPlayerObj != null ? currentPlayerObj.GetComponent<PlayerBankAccounts>() : null;
 
-        // Get the owner's bank account using Photon-spawned player
-        GameObject ownerPlayerObj = GetPhotonPlayer(ownerPlayer);
+        // Get the owner's bank account using player
+        GameObject ownerPlayerObj = GetPlayer(ownerPlayer);
         PlayerBankAccounts ownerBank = ownerPlayerObj != null ? ownerPlayerObj.GetComponent<PlayerBankAccounts>() : null;
 
         if (currentBank != null && ownerBank != null)
@@ -147,10 +142,12 @@ public class PayRentUI : MonoBehaviour
 
         // Spawn current player at their fight spawn (only if we own this player)
         // Use the player prefab name from the prefab asset
-        string prefabName = playerPrefab.name;
-
+        GameObject currentFightPlayer = Instantiate(playerPrefab, currentSpawnPos, currentSpawnRot);
+        currentFightPlayer.name = "Player" + (currentPlayer + 1) + "_Fight";
 
         // Spawn opponent at their fight spawn
+        GameObject opponentFightPlayer = Instantiate(playerPrefab, opponentSpawnPos, opponentSpawnRot);
+        opponentFightPlayer.name = "Player" + (opponentIndex + 1) + "_Fight";
 
         // Switch to FPS mode (all clients)
         gameMode.buttonSwitchGameMode();

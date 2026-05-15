@@ -1,23 +1,35 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class GameMode : MonoBehaviour
 {
-    [SerializeField] bool isFPSMode = false;
+    [SerializeField] public bool isFPSMode = false; // Default to Board mode for UI interaction
     [SerializeField] DisableFPS disableFPS;
     [SerializeField] GameObject boardEmpty;
+    [SerializeField] CameraManager cameraManager;
+
+    public bool IsFPSMode => isFPSMode;
 
     void Start()
     {
         disableFPS = DisableFPS.FindFirstObjectByType<DisableFPS>();
-        if(!isFPSMode)
+        cameraManager = CameraManager.Instance;
+
+        // Start in Board mode by default so players can interact with UI
+        isFPSMode = false;
+        CameraMode initialMode = CameraMode.Board;
+        
+        if (cameraManager != null)
         {
-            disableFPS.DisableFPSObjects();
+            cameraManager.SetupCameras(
+                PlayerManager.Instance != null ? PlayerManager.Instance.GetPlayerCount() : 1,
+                initialMode
+            );
         }
-        else // isFPSMode
-        {
-            disableFPS.EnableFPSObjects();
-        }
+
+        // Note: DisableFPS.DisableFPSObjects() is called automatically in DisableFPS.Start()
+        // No need to call it here again
     }
 
     //public void switchGameModeButton()
@@ -29,6 +41,8 @@ public class GameMode : MonoBehaviour
     // switch to other game mode
     public void buttonSwitchGameMode()
     {
+        CameraMode newMode = !isFPSMode ? CameraMode.FPS : CameraMode.Board;
+
         if (!isFPSMode)
         {
             boardEmpty.SetActive(false);
@@ -44,6 +58,12 @@ public class GameMode : MonoBehaviour
 
             isFPSMode = false;
             Debug.Log("switched from fps to board mode");
+        }
+
+        // Update camera manager
+        if (cameraManager != null)
+        {
+            cameraManager.SwitchMode(newMode);
         }
     }
 
