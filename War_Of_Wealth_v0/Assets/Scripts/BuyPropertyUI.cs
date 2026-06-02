@@ -11,10 +11,11 @@ public class BuyPropertyUI : MonoBehaviour
     private BoardSpace currentSpace;
     private int currentPlayerIndex;
     private DisableFPS disableFPS;
-
+    private BoardTurns boardTurnsInstance;
     private void Awake()
     {
         disableFPS = FindAnyObjectByType<DisableFPS>();
+        boardTurnsInstance = FindAnyObjectByType<BoardTurns>();
     }
 
     // Called when a player lands on a property
@@ -52,10 +53,12 @@ public class BuyPropertyUI : MonoBehaviour
 
         // Assign property
         bank.AddProperty(currentSpace);
+        boardTurnsInstance.AddPropertyToPlayer(currentPlayerIndex, currentSpace.spaceIndex);
 
         // Mark the board space as owned
         currentSpace.isOwned = true;
         currentSpace.ownerPlayerIndex = currentPlayerIndex;
+        
 
         // Close UI
         gameObject.SetActive(false);

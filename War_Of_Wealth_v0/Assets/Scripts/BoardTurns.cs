@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ public class BoardTurns : MonoBehaviour
     [SerializeField] TextMeshProUGUI currentPlayerStats;
     [SerializeField] TextMeshProUGUI diceRollResultText;
     [SerializeField] TextMeshProUGUI currentplayerMoney;
+    [SerializeField] Image[] propertyImages;
 
     public GameObject[] playerGameObjects;
 
@@ -31,6 +33,7 @@ public class BoardTurns : MonoBehaviour
     public int[] playerLocations;
     public int currPlayer = 0;
     private bool isMoving = false;
+    private List<int>[] ownedPropertyIndices; // Stores property indices for each player
 
     void Start()
     {
@@ -40,6 +43,11 @@ public class BoardTurns : MonoBehaviour
         // Initialize player locations array
         int playerCount = PlayerManager.Instance != null ? PlayerManager.Instance.GetPlayerCount() : 0;
         playerLocations = new int[playerCount];
+        ownedPropertyIndices = new List<int>[playerCount];
+        for (int i = 0; i < playerCount; i++)
+        {
+            ownedPropertyIndices[i] = new List<int>();
+        }
 
         Debug.Log($"BoardTurns initialized for {playerCount} players");
     }
@@ -156,32 +164,50 @@ public class BoardTurns : MonoBehaviour
 
         int money = bank != null ? bank.currentBalance : 0;
 
-        List<string> ownedProperties = new List<string>();
-
-        if (boardSpaces != null)
+        // Display owned property images using stored indices
+        if (propertyImages != null && ownedPropertyIndices != null && currPlayer < ownedPropertyIndices.Length)
         {
-            for (int i = 0; i < boardSpaces.Length; i++)
+            List<int> playerProperties = ownedPropertyIndices[currPlayer];
+
+            for (int i = 0; i < propertyImages.Length; i++)
             {
-                if (boardSpaces[i] != null && boardSpaces[i].ownerPlayerIndex == currPlayer)
+                if (i < playerProperties.Count && boardSpaces != null)
                 {
-                    ownedProperties.Add(boardSpaces[i].spaceName);
+                    int propertyIndex = playerProperties[i];
+                    propertyImages[i].sprite = boardSpaces[propertyIndex].cardimage;
+                    propertyImages[i].enabled = true;
+                }
+                else
+                {
+                    propertyImages[i].enabled = false;
                 }
             }
         }
 
-        string propertiesText =
-            ownedProperties.Count > 0
-            ? "\nProperties: " + string.Join(", ", ownedProperties)
-            : "\nNo properties owned";
-
         if (currentPlayerStats != null)
         {
-            currentPlayerStats.text = $"Player {currPlayer + 1}'s turn{propertiesText}";
+            currentPlayerStats.text = $"Player {currPlayer + 1}'s turn";
         }
 
         if (currentplayerMoney != null)
         {
             currentplayerMoney.text = $"${money}";
+        }
+    }
+
+    public void AddPropertyToPlayer(int playerIndex, int propertyIndex)
+    {
+        if (ownedPropertyIndices != null && playerIndex < ownedPropertyIndices.Length)
+        {
+            ownedPropertyIndices[playerIndex].Add(propertyIndex);
+        }
+    }
+
+    public void RemovePropertyFromPlayer(int playerIndex, int propertyIndex)
+    {
+        if (ownedPropertyIndices != null && playerIndex < ownedPropertyIndices.Length)
+        {
+            ownedPropertyIndices[playerIndex].Remove(propertyIndex);
         }
     }
 }
