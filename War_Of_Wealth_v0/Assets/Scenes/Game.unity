@@ -9226,6 +9226,7 @@ GameObject:
   - component: {fileID: 1110892758}
   - component: {fileID: 1110892760}
   - component: {fileID: 1110892761}
+  - component: {fileID: 1110892762}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -9424,6 +9425,28 @@ MonoBehaviour:
   playerMovements: []
   playerHealths: []
   playerBanks: []
+--- !u!114 &1110892762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1110892754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48dc532788b890e429b528c3721ce77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PayRentUI
+  boardTurns: {fileID: 1614921049}
+  gameMode: {fileID: 1110892755}
+  FPSCanvas: {fileID: 53567766}
+  playerPrefab: {fileID: 1232265125}
+  player1FightSpawn: {fileID: 336280794}
+  player2FightSpawn: {fileID: 1569494156}
+  fightUI: {fileID: 1017590411}
+  promptText: {fileID: 615917330}
+  EndTurnUI: {fileID: 420533272}
+  currentPlayerIndex: 2
 --- !u!1 &1117518555 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2947962649251566305, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -10264,6 +10287,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1227265732}
   m_CullTransparentMesh: 1
+--- !u!1 &1232265125 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8056189271933156418, guid: 95923c15ea39f0349a22cd5beba898d4, type: 3}
+  m_PrefabInstance: {fileID: 336280793}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1237527797
 GameObject:
   m_ObjectHideFlags: 0
@@ -13552,6 +13580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardTurns
   boardVariables: {fileID: 1614921054}
+  tileEffects: {fileID: 0}
   currentPlayerStats: {fileID: 2083885994}
   diceRollResultText: {fileID: 1257730318}
   currentplayerMoney: {fileID: 2028565674}
@@ -14859,6 +14888,9 @@ MonoBehaviour:
   InJailUI: {fileID: 131337531}
   boardTurns: {fileID: 1614921049}
   AimChallengeUI: {fileID: 577634831}
+  fightTeleport: {fileID: 0}
+  chanceCard: {fileID: 0}
+  battleIntroSeconds: 1.5
 --- !u!114 &1614921054
 MonoBehaviour:
   m_ObjectHideFlags: 0
