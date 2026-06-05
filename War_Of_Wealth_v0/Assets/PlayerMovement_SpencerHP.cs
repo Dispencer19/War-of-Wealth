@@ -23,10 +23,11 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
     [SerializeField] private Transform orientation;
 
     [Header("Status")]
-    public bool canMove = true; // moved inside the class
+    public bool canMove = true;
 
     [Header("Player Input")]
-    [SerializeField] public int playerIndex = 0; // 0 for player 1, 1 for player 2, etc.
+    [SerializeField] public int playerIndex = 0; // 0 = player 1 (keyboard), 1 = player 2 (gamepad)
+    [SerializeField] private float stickDeadzone = 0.15f;
 
     private float horizontalInput;
     private float verticalInput;
@@ -66,8 +67,20 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
         // Jump input based on player index
         if (grounded && readyToJump)
         {
-            if ((playerIndex == 0 && Keyboard.current.spaceKey.wasPressedThisFrame) ||
-                (playerIndex == 1 && Keyboard.current.enterKey.wasPressedThisFrame))
+            bool jumpPressed = false;
+
+            if (playerIndex == 0)
+            {
+                jumpPressed = Keyboard.current != null &&
+                              Keyboard.current.spaceKey.wasPressedThisFrame;
+            }
+            else // player 2: gamepad south button (A on Xbox / X on PlayStation)
+            {
+                jumpPressed = Gamepad.current != null &&
+                              Gamepad.current.buttonSouth.wasPressedThisFrame;
+            }
+
+            if (jumpPressed)
             {
                 readyToJump = false;
                 Jump();
@@ -83,11 +96,14 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
 
     private void ReadInput()
     {
-        if (Keyboard.current == null) return;
+        horizontalInput = 0f;
+        verticalInput = 0f;
 
         if (playerIndex == 0)
         {
             // Player 1: WASD
+            if (Keyboard.current == null) return;
+
             horizontalInput =
                 (Keyboard.current.dKey.isPressed ? 1 : 0) -
                 (Keyboard.current.aKey.isPressed ? 1 : 0);
@@ -96,16 +112,16 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
                 (Keyboard.current.wKey.isPressed ? 1 : 0) -
                 (Keyboard.current.sKey.isPressed ? 1 : 0);
         }
-        else if (playerIndex == 1)
+        else
         {
-            // Player 2: Arrow keys
-            horizontalInput =
-                (Keyboard.current.rightArrowKey.isPressed ? 1 : 0) -
-                (Keyboard.current.leftArrowKey.isPressed ? 1 : 0);
+            // Player 2: gamepad left stick
+            if (Gamepad.current == null) return;
 
-            verticalInput =
-                (Keyboard.current.upArrowKey.isPressed ? 1 : 0) -
-                (Keyboard.current.downArrowKey.isPressed ? 1 : 0);
+            Vector2 stick = Gamepad.current.leftStick.ReadValue();
+            if (stick.magnitude < stickDeadzone) stick = Vector2.zero;
+
+            horizontalInput = stick.x;
+            verticalInput = stick.y;
         }
     }
 
@@ -137,19 +153,17 @@ public class PlayerMovement_SpencerHP : MonoBehaviour
 
     private void ControlDrag()
     {
-        rb.linearDamping = grounded ? groundDrag : 0f; // linearDamping → drag
+        rb.linearDamping = grounded ? groundDrag : 0f;
     }
 
     public void TeleportPlayer(Vector3 position, Quaternion rotation)
     {
-        // Stop physics movement
         if (rb != null)
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
 
-        // Teleport the player
         transform.position = position;
         transform.rotation = rotation;
 

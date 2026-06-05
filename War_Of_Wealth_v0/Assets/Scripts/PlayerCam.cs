@@ -4,22 +4,26 @@ using UnityEngine.InputSystem;
 public class PlayerCam : MonoBehaviour
 {
     [Header("Sensitivity")]
-    [SerializeField] public float sensX = 100f;
-    [SerializeField] public float sensY = 100f;
+    [SerializeField] public float sensX = 100f;   // mouse (player 1)
+    [SerializeField] public float sensY = 100f;   // mouse (player 1)
+
+    [Header("Gamepad Look (player 2)")]
+    [SerializeField] public float gamepadLookSpeedX = 220f; // degrees per second
+    [SerializeField] public float gamepadLookSpeedY = 220f;
+    [SerializeField] private float stickDeadzone = 0.15f;
 
     [Header("References")]
     [SerializeField] private Transform orientation;
 
     [Header("Player Settings")]
-    [SerializeField] public int playerIndex = 0; // 0 for player 1, 1 for player 2, etc.
+    [SerializeField] public int playerIndex = 0; // 0 = player 1 (mouse), 1 = player 2 (gamepad)
 
     private float xRotation;
-    
     private float yRotation;
 
     private void Start()
     {
-        // Only lock cursor for player 1 (main player) to avoid conflicts
+        // Only lock the cursor for player 1 (mouse aiming). Player 2 uses a gamepad.
         if (playerIndex == 0)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -39,18 +43,33 @@ public class PlayerCam : MonoBehaviour
 
     private void Update()
     {
-        if (Mouse.current == null) return;
+        float lookX = 0f;
+        float lookY = 0f;
 
-        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+        if (playerIndex == 0)
+        {
+            // Player 1: mouse look. Mouse delta is already frame-scaled, so no Time.deltaTime on the delta.
+            if (Mouse.current != null)
+            {
+                Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+                lookX = mouseDelta.x * sensX * Time.deltaTime;
+                lookY = mouseDelta.y * sensY * Time.deltaTime;
+            }
+        }
+        else
+        {
+            // Player 2 (and beyond): gamepad right stick. Stick is a rate, so scale by Time.deltaTime.
+            if (Gamepad.current != null)
+            {
+                Vector2 stick = Gamepad.current.rightStick.ReadValue();
+                if (stick.magnitude < stickDeadzone) stick = Vector2.zero;
+                lookX = stick.x * gamepadLookSpeedX * Time.deltaTime;
+                lookY = stick.y * gamepadLookSpeedY * Time.deltaTime;
+            }
+        }
 
-        // Only allow mouse control for the current player's camera
-        // In split-screen, each player controls their own camera
-        float mouseX = mouseDelta.x * sensX * Time.deltaTime;
-        float mouseY = mouseDelta.y * sensY * Time.deltaTime;
-
-        yRotation += mouseX;
-        xRotation -= mouseY; // correct FPS inversion
-
+        yRotation += lookX;
+        xRotation -= lookY; // correct FPS inversion
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);

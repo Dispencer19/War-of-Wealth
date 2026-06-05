@@ -7,6 +7,12 @@ public enum CameraMode
     FPS
 }
 
+public enum SplitOrientation
+{
+    Horizontal, // stacked: player 1 top, player 2 bottom
+    Vertical    // side by side: player 1 left, player 2 right
+}
+
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance { get; private set; }
@@ -17,6 +23,9 @@ public class CameraManager : MonoBehaviour
 
     [Header("FPS Camera Settings")]
     [SerializeField] private float fpsMouseSensitivity = 100f;
+
+    [Header("Split Screen")]
+    [SerializeField] private SplitOrientation splitOrientation = SplitOrientation.Horizontal;
 
     [Header("References")]
     [SerializeField] private GameMode gameMode;
@@ -81,7 +90,7 @@ public class CameraManager : MonoBehaviour
 
         foreach (GameObject playerObj in playerObjects)
         {
-            Camera playerCam = playerObj.GetComponentInChildren<Camera>();
+            Camera playerCam = playerObj.GetComponentInChildren<Camera>(true);
             if (playerCam != null)
             {
                 playerCameras.Add(playerCam);
@@ -93,11 +102,12 @@ public class CameraManager : MonoBehaviour
 
     private void ConfigureBoardMode()
     {
-        // Disable all player cameras
+        // Disable all player cameras and restore their viewport to full screen
         foreach (Camera cam in playerCameras)
         {
             if (cam != null)
             {
+                cam.rect = new Rect(0, 0, 1, 1);
                 cam.enabled = false;
             }
         }
@@ -124,31 +134,72 @@ public class CameraManager : MonoBehaviour
 
     private void ConfigureFPSMode()
     {
-        // Disable main camera
+        // Disable main (board) camera
         if (mainCamera != null)
         {
             mainCamera.enabled = false;
         }
 
-        // Enable and configure player cameras
+        int activeCount = playerCameras.Count;
+
+        // Enable and configure player cameras into split-screen viewports
         for (int i = 0; i < playerCameras.Count; i++)
         {
             Camera cam = playerCameras[i];
-            if (cam != null)
+            if (cam == null) continue;
+
+            cam.enabled = true;
+            cam.rect = GetViewportRect(i, activeCount);
+
+            // Add or configure PlayerCam component for FPS control
+            PlayerCam playerCam = cam.GetComponent<PlayerCam>();
+            if (playerCam == null)
             {
-                cam.enabled = true;
-
-                // Add or configure PlayerCam component for FPS control
-                PlayerCam playerCam = cam.GetComponent<PlayerCam>();
-                if (playerCam == null)
-                {
-                    playerCam = cam.gameObject.AddComponent<PlayerCam>();
-                }
-
-                playerCam.playerIndex = i;
-                playerCam.sensX = fpsMouseSensitivity;
-                playerCam.sensY = fpsMouseSensitivity;
+                playerCam = cam.gameObject.AddComponent<PlayerCam>();
             }
+
+            playerCam.playerIndex = i;
+            playerCam.sensX = fpsMouseSensitivity;
+            playerCam.sensY = fpsMouseSensitivity;
+
+            // Only player 1's camera keeps an active AudioListener to avoid
+            // Unity's "multiple audio listeners" warning in split screen.
+            AudioListener listener = cam.GetComponent<AudioListener>();
+            if (listener != null) listener.enabled = (i == 0);
+        }
+    }
+
+    // Returns the normalized viewport rect (origin bottom-left) for a player.
+    private Rect GetViewportRect(int index, int count)
+    {
+        // Single player (or fallback): full screen.
+        if (count <= 1) return new Rect(0, 0, 1, 1);
+
+        // Two players: clean split based on chosen orientation.
+        if (count == 2)
+        {
+            if (splitOrientation == SplitOrientation.Horizontal)
+            {
+                // index 0 = top, index 1 = bottom
+                return index == 0 ? new Rect(0, 0.5f, 1, 0.5f)
+                                  : new Rect(0, 0f, 1, 0.5f);
+            }
+            else
+            {
+                // index 0 = left, index 1 = right
+                return index == 0 ? new Rect(0f, 0, 0.5f, 1)
+                                  : new Rect(0.5f, 0, 0.5f, 1);
+            }
+        }
+
+        // 3-4 players: quadrants (defensive fallback; not required for 2P).
+        float halfW = 0.5f, halfH = 0.5f;
+        switch (index)
+        {
+            case 0: return new Rect(0f, 0.5f, halfW, halfH);
+            case 1: return new Rect(0.5f, 0.5f, halfW, halfH);
+            case 2: return new Rect(0f, 0f, halfW, halfH);
+            default: return new Rect(0.5f, 0f, halfW, halfH);
         }
     }
 
@@ -177,9 +228,8 @@ public class CameraManager : MonoBehaviour
 
     public Camera GetPlayerCamera(int playerIndex)
     {
-        if (playerIndex == 0) return mainCamera;
-        if (playerIndex > 0 && playerIndex - 1 < playerCameras.Count)
-            return playerCameras[playerIndex - 1];
+        if (playerIndex >= 0 && playerIndex < playerCameras.Count)
+            return playerCameras[playerIndex];
         return null;
     }
 

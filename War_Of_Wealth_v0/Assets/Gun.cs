@@ -22,6 +22,11 @@ public class Gun : MonoBehaviour
     public ParticleSystem muzzleFlash;
     public LineRenderer Tracer;
 
+    [Header("Player Input")]
+    [SerializeField] public int playerIndex = 0; // 0 = player 1 (mouse + R), 1 = player 2 (gamepad)
+    [Tooltip("Root transform of the player that owns this gun, used to prevent self-damage.")]
+    public Transform ownerRoot;
+
     [Header("UI")]
     public TextMeshProUGUI ammoText;
 
@@ -33,38 +38,56 @@ public class Gun : MonoBehaviour
     private int currentammo;
     private bool isReloading = false;
 
-    private PlayerControls controls;
-    private bool isFiring;
-
     private AudioSource audioSource;
 
     private void Awake()
     {
-        controls = new PlayerControls();
-
-        controls.Player.Fire.started += ctx => isFiring = true;
-        controls.Player.Fire.canceled += ctx => isFiring = false;
-        controls.Player.Reload.performed += ctx => Reload();
-
         audioSource = GetComponent<AudioSource>();
         currentammo = maxammo;
 
+        // Fallbacks so the gun still works if references aren't wired in the inspector.
+        if (fpsCam == null) fpsCam = GetComponentInParent<Camera>();
+        if (fpsCam == null && transform.root != null) fpsCam = transform.root.GetComponentInChildren<Camera>(true);
+        if (ownerRoot == null) ownerRoot = transform.root;
+
         UpdateAmmoUI();
     }
-
-    private void OnEnable() => controls.Enable();
-    private void OnDisable() => controls.Disable();
 
     void Update()
     {
         if (isReloading)
             return;
 
-        if (isFiring && Time.time >= nextTimeToFire)
+        if (ReloadPressed())
+        {
+            Reload();
+            return;
+        }
+
+        if (FirePressed() && Time.time >= nextTimeToFire)
         {
             nextTimeToFire = Time.time + fireRate;
             Shoot();
         }
+    }
+
+    // ---- Per-player input ----
+    private bool FirePressed()
+    {
+        if (playerIndex == 0)
+            return Mouse.current != null && Mouse.current.leftButton.isPressed;
+
+        // Player 2: gamepad right trigger
+        return Gamepad.current != null && Gamepad.current.rightTrigger.ReadValue() > 0.5f;
+    }
+
+    private bool ReloadPressed()
+    {
+        if (playerIndex == 0)
+            return Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
+
+        // Player 2: gamepad west button (X on Xbox / Square on PlayStation)
+        return Gamepad.current != null && Gamepad.current.buttonWest.wasPressedThisFrame;
     }
 
     void Shoot()
@@ -78,14 +101,17 @@ public class Gun : MonoBehaviour
         currentammo--;
         UpdateAmmoUI();
 
-        Vector3 startPoint = muzzle.position;
+        Vector3 startPoint = muzzle != null ? muzzle.position : fpsCam.transform.position;
         Vector3 endPoint;
 
         if (muzzleFlash != null)
             muzzleFlash.Play();
 
-        audioSource.Stop();
-        audioSource.PlayOneShot(firesound);
+        if (audioSource != null && firesound != null)
+        {
+            audioSource.Stop();
+            audioSource.PlayOneShot(firesound);
+        }
 
         Ray ray = new Ray(fpsCam.transform.position, fpsCam.transform.forward);
         RaycastHit hit;
@@ -94,17 +120,26 @@ public class Gun : MonoBehaviour
         {
             endPoint = hit.point;
 
-            // HIT TARGET CHECK
+            // PVP: damage the other player.
+            PlayerHealth playerHealth = hit.transform.GetComponentInParent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                bool isSelf = ownerRoot != null && playerHealth.transform.root == ownerRoot.root;
+                if (!isSelf)
+                {
+                    playerHealth.TakeDamage(Mathf.RoundToInt(damage));
+                    score += 10;
+                }
+            }
+
+            // Shooting-range targets (kept from the original behaviour).
             Target target = hit.transform.GetComponent<Target>();
             if (target != null)
             {
                 target.TakeDamage(damage);
-
-                // SCORE SYSTEM
                 score += 10;
             }
 
-            // HIT EFFECT
             if (hitEffect != null)
             {
                 Instantiate(hitEffect, hit.point, Quaternion.LookRotation(hit.normal));
@@ -120,6 +155,8 @@ public class Gun : MonoBehaviour
 
     private IEnumerator ShowTracer(Vector3 start, Vector3 end)
     {
+        if (Tracer == null) yield break;
+
         Tracer.enabled = true;
         Tracer.SetPosition(0, start);
         Tracer.SetPosition(1, end);
@@ -142,7 +179,7 @@ public class Gun : MonoBehaviour
         isReloading = true;
         UpdateAmmoUI();
 
-        if (reloadSound != null)
+        if (reloadSound != null && audioSource != null)
             audioSource.PlayOneShot(reloadSound);
 
         yield return new WaitForSeconds(reloadtime);

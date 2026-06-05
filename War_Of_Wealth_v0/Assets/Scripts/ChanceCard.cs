@@ -19,6 +19,20 @@ public class ChanceCard : MonoBehaviour
     public TextMeshProUGUI cardDescriptionText; // UI text for card description
 
 
+    // Resets the panel to its pre-draw state. Call this each time the card UI opens.
+    public void ResetCardUI()
+    {
+        if (Draw != null) Draw.SetActive(true);          // show the Draw button
+        if (OKbutton != null) OKbutton.SetActive(false); // hide OK until a card is drawn
+        if (cardTitleText != null) cardTitleText.text = "";
+        if (cardDescriptionText != null) cardDescriptionText.text = "";
+    }
+
+    private void OnEnable()
+    {
+        // Backup reset in case the ChanceCard component lives on the panel itself.
+        ResetCardUI();
+    }
 
 
     public void DrawCard()

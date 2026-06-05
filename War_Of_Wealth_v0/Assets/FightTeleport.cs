@@ -10,6 +10,9 @@ public class FightTeleport : MonoBehaviour
     [SerializeField] private Transform player1Spawn;
     [SerializeField] private Transform player2Spawn;
 
+    [Header("References")]
+    [SerializeField] private DisableFPS disableFPS;
+
     private void Start()
     {
         // Find spawn points by name if not assigned
@@ -24,18 +27,27 @@ public class FightTeleport : MonoBehaviour
             GameObject spawn2 = GameObject.Find("Player2FightSpawn");
             if (spawn2 != null) player2Spawn = spawn2.transform;
         }
+
+        if (disableFPS == null)
+            disableFPS = FindFirstObjectByType<DisableFPS>();
+    }
+
+    // Set which two players fight. Called before StartFight() so a contended
+    // property battle is current-player vs. the property owner.
+    public void SetFighters(int attackerIndex, int defenderIndex)
+    {
+        player1Index = attackerIndex;
+        player2Index = defenderIndex;
     }
 
     public void StartFight()
     {
-        // Check if PlayerManager exists
         if (PlayerManager.Instance == null)
         {
             Debug.LogError("PlayerManager not found! Cannot start fight.");
             return;
         }
 
-        // Validate player indices
         if (player1Index >= PlayerManager.Instance.GetPlayerCount() ||
             player2Index >= PlayerManager.Instance.GetPlayerCount())
         {
@@ -43,22 +55,33 @@ public class FightTeleport : MonoBehaviour
             return;
         }
 
-        // Check spawn points
         if (player1Spawn == null || player2Spawn == null)
         {
             Debug.LogError("Fight spawn points not set!");
             return;
         }
 
-        // Teleport players using PlayerManager
+        // 1. Enter split-screen FPS mode. SwitchMode also activates the FPS
+        //    player objects and FPS UI via DisableFPS.EnableFPSObjects().
+        if (CameraManager.Instance != null)
+        {
+            CameraManager.Instance.SwitchMode(CameraMode.FPS);
+        }
+        else if (disableFPS != null)
+        {
+            // Fallback if there's no CameraManager in the scene.
+            disableFPS.EnableFPSObjects();
+        }
+
+        // 2. Place the fighters at their spawn points.
         PlayerManager.Instance.TeleportPlayer(player1Index, player1Spawn.position, player1Spawn.rotation);
         PlayerManager.Instance.TeleportPlayer(player2Index, player2Spawn.position, player2Spawn.rotation);
 
-        // Disable player movement during fight
-        PlayerManager.Instance.DisablePlayerMovement(player1Index);
-        PlayerManager.Instance.DisablePlayerMovement(player2Index);
+        // 3. Enable movement so both players can actually fight.
+        PlayerManager.Instance.EnablePlayerMovement(player1Index);
+        PlayerManager.Instance.EnablePlayerMovement(player2Index);
 
-        // Reset health
+        // 4. Fresh health for the duel.
         PlayerManager.Instance.ResetPlayerHealth(player1Index);
         PlayerManager.Instance.ResetPlayerHealth(player2Index);
 
@@ -67,13 +90,22 @@ public class FightTeleport : MonoBehaviour
 
     public void EndFight()
     {
-        // Re-enable player movement
         if (PlayerManager.Instance != null)
         {
-            PlayerManager.Instance.EnablePlayerMovement(player1Index);
-            PlayerManager.Instance.EnablePlayerMovement(player2Index);
+            PlayerManager.Instance.DisablePlayerMovement(player1Index);
+            PlayerManager.Instance.DisablePlayerMovement(player2Index);
         }
 
-        Debug.Log("Fight ended - player movement restored");
+        // Return to the shared overhead board view.
+        if (CameraManager.Instance != null)
+        {
+            CameraManager.Instance.SwitchMode(CameraMode.Board);
+        }
+        else if (disableFPS != null)
+        {
+            disableFPS.DisableFPSObjects();
+        }
+
+        Debug.Log("Fight ended - returned to board view");
     }
 }

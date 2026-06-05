@@ -8,6 +8,7 @@ public class BoardTurns : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] BoardVariables boardVariables;
+    [SerializeField] TileEffects tileEffects;
 
     [SerializeField] TextMeshProUGUI currentPlayerStats;
     [SerializeField] TextMeshProUGUI diceRollResultText;
@@ -147,6 +148,10 @@ public class BoardTurns : MonoBehaviour
             Debug.LogError("PlayerManager not found!");
             return;
         }
+
+        // Clear any popup left over from this turn (chance card, buy/rent, battle bubble, etc.)
+        if (tileEffects == null) tileEffects = FindFirstObjectByType<TileEffects>();
+        if (tileEffects != null) tileEffects.HideAllTileUIs();
 
         currPlayer = (currPlayer + 1) % PlayerManager.Instance.GetPlayerCount();
         Debug.Log($"Player {currPlayer + 1}'s turn");
