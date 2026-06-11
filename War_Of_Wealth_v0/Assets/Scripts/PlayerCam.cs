@@ -4,33 +4,41 @@ using UnityEngine.InputSystem;
 public class PlayerCam : MonoBehaviour
 {
     [Header("Sensitivity")]
-    [SerializeField] public float sensX = 100f;   // mouse (player 1)
-    [SerializeField] public float sensY = 100f;   // mouse (player 1)
+    [SerializeField] public float sensX = 100f;
+    [SerializeField] public float sensY = 100f;
 
     [Header("Gamepad Look (player 2)")]
-    [SerializeField] public float gamepadLookSpeedX = 220f; // degrees per second
+    [SerializeField] public float gamepadLookSpeedX = 220f;
     [SerializeField] public float gamepadLookSpeedY = 220f;
     [SerializeField] private float stickDeadzone = 0.15f;
+
+    [Header("ADS (Zoom)")]
+    [SerializeField] private float normalFOV = 60f;
+    [SerializeField] private float adsFOV = 40f;
+    [SerializeField] private float zoomSpeed = 10f;
 
     [Header("References")]
     [SerializeField] private Transform orientation;
 
     [Header("Player Settings")]
-    [SerializeField] public int playerIndex = 0; // 0 = player 1 (mouse), 1 = player 2 (gamepad)
+    [SerializeField] public int playerIndex = 0; // 0 = mouse, 1 = gamepad
 
     private float xRotation;
     private float yRotation;
 
+    private Camera cam;
+
     private void Start()
     {
-        // Only lock the cursor for player 1 (mouse aiming). Player 2 uses a gamepad.
+        cam = GetComponent<Camera>();
+        cam.fieldOfView = normalFOV;
+
         if (playerIndex == 0)
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
 
-        // Find orientation if not set
         if (orientation == null)
         {
             orientation = transform.parent?.Find("Orientation");
@@ -48,7 +56,7 @@ public class PlayerCam : MonoBehaviour
 
         if (playerIndex == 0)
         {
-            // Player 1: mouse look. Mouse delta is already frame-scaled, so no Time.deltaTime on the delta.
+            // Mouse look
             if (Mouse.current != null)
             {
                 Vector2 mouseDelta = Mouse.current.delta.ReadValue();
@@ -58,7 +66,7 @@ public class PlayerCam : MonoBehaviour
         }
         else
         {
-            // Player 2 (and beyond): gamepad right stick. Stick is a rate, so scale by Time.deltaTime.
+            // Gamepad look
             if (Gamepad.current != null)
             {
                 Vector2 stick = Gamepad.current.rightStick.ReadValue();
@@ -68,8 +76,9 @@ public class PlayerCam : MonoBehaviour
             }
         }
 
+        // Rotation
         yRotation += lookX;
-        xRotation -= lookY; // correct FPS inversion
+        xRotation -= lookY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
@@ -77,5 +86,20 @@ public class PlayerCam : MonoBehaviour
         {
             orientation.rotation = Quaternion.Euler(0f, yRotation, 0f);
         }
+
+        // ADS Zoom
+        bool isADS = false;
+
+        if (playerIndex == 0 && Mouse.current != null)
+        {
+            isADS = Mouse.current.rightButton.isPressed;
+        }
+        else if (playerIndex != 0 && Gamepad.current != null)
+        {
+            isADS = Gamepad.current.leftTrigger.ReadValue() > 0.1f;
+        }
+
+        float targetFOV = isADS ? adsFOV : normalFOV;
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, zoomSpeed * Time.deltaTime);
     }
 }

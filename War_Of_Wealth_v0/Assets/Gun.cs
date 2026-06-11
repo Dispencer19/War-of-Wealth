@@ -17,14 +17,19 @@ public class Gun : MonoBehaviour
     public float reloadtime = 1.5f;
     public int maxammo = 6;
 
+    [Header("Bloom (Accuracy)")]
+    [SerializeField] private float baseSpread = 0.2f;      // Minimum accuracy
+    [SerializeField] private float maxSpread = 3f;         // Max bloom
+    [SerializeField] private float spreadIncrease = 0.4f;  // Per shot
+    [SerializeField] private float spreadRecovery = 6f;    // Recovery speed
+
     [Header("References")]
     public Camera fpsCam;
     public ParticleSystem muzzleFlash;
     public LineRenderer Tracer;
 
     [Header("Player Input")]
-    [SerializeField] public int playerIndex = 0; // 0 = player 1 (mouse + R), 1 = player 2 (gamepad)
-    [Tooltip("Root transform of the player that owns this gun, used to prevent self-damage.")]
+    [SerializeField] public int playerIndex = 0;
     public Transform ownerRoot;
 
     [Header("UI")]
@@ -38,16 +43,19 @@ public class Gun : MonoBehaviour
     private int currentammo;
     private bool isReloading = false;
 
+    private float currentSpread;
     private AudioSource audioSource;
 
     private void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         currentammo = maxammo;
+        currentSpread = baseSpread;
 
-        // Fallbacks so the gun still works if references aren't wired in the inspector.
         if (fpsCam == null) fpsCam = GetComponentInParent<Camera>();
-        if (fpsCam == null && transform.root != null) fpsCam = transform.root.GetComponentInChildren<Camera>(true);
+        if (fpsCam == null && transform.root != null)
+            fpsCam = transform.root.GetComponentInChildren<Camera>(true);
+
         if (ownerRoot == null) ownerRoot = transform.root;
 
         UpdateAmmoUI();
@@ -55,6 +63,9 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
+        // Bloom recovery
+        currentSpread = Mathf.Lerp(currentSpread, baseSpread, spreadRecovery * Time.deltaTime);
+
         if (isReloading)
             return;
 
@@ -71,13 +82,11 @@ public class Gun : MonoBehaviour
         }
     }
 
-    // ---- Per-player input ----
     private bool FirePressed()
     {
         if (playerIndex == 0)
             return Mouse.current != null && Mouse.current.leftButton.isPressed;
 
-        // Player 2: gamepad right trigger
         return Gamepad.current != null && Gamepad.current.rightTrigger.ReadValue() > 0.5f;
     }
 
@@ -86,7 +95,6 @@ public class Gun : MonoBehaviour
         if (playerIndex == 0)
             return Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
 
-        // Player 2: gamepad west button (X on Xbox / Square on PlayStation)
         return Gamepad.current != null && Gamepad.current.buttonWest.wasPressedThisFrame;
     }
 
@@ -101,26 +109,36 @@ public class Gun : MonoBehaviour
         currentammo--;
         UpdateAmmoUI();
 
-        Vector3 startPoint = muzzle != null ? muzzle.position : fpsCam.transform.position;
-        Vector3 endPoint;
+        // Increase bloom
+        currentSpread = Mathf.Clamp(currentSpread + spreadIncrease, baseSpread, maxSpread);
 
         if (muzzleFlash != null)
             muzzleFlash.Play();
 
         if (audioSource != null && firesound != null)
-        {
-            audioSource.Stop();
             audioSource.PlayOneShot(firesound);
-        }
 
-        Ray ray = new Ray(fpsCam.transform.position, fpsCam.transform.forward);
+        Vector3 startPoint = muzzle != null ? muzzle.position : fpsCam.transform.position;
+
+        // Apply bloom to direction
+        Vector3 spread = new Vector3(
+            Random.Range(-currentSpread, currentSpread),
+            Random.Range(-currentSpread, currentSpread),
+            0f
+        );
+
+        Vector3 direction = fpsCam.transform.forward +
+                            fpsCam.transform.TransformDirection(spread * 0.01f);
+
+        Ray ray = new Ray(fpsCam.transform.position, direction);
         RaycastHit hit;
+
+        Vector3 endPoint;
 
         if (Physics.Raycast(ray, out hit, range))
         {
             endPoint = hit.point;
 
-            // PVP: damage the other player.
             PlayerHealth playerHealth = hit.transform.GetComponentInParent<PlayerHealth>();
             if (playerHealth != null)
             {
@@ -132,7 +150,6 @@ public class Gun : MonoBehaviour
                 }
             }
 
-            // Shooting-range targets (kept from the original behaviour).
             Target target = hit.transform.GetComponent<Target>();
             if (target != null)
             {
@@ -141,13 +158,11 @@ public class Gun : MonoBehaviour
             }
 
             if (hitEffect != null)
-            {
                 Instantiate(hitEffect, hit.point, Quaternion.LookRotation(hit.normal));
-            }
         }
         else
         {
-            endPoint = startPoint + fpsCam.transform.forward * range;
+            endPoint = startPoint + direction * range;
         }
 
         StartCoroutine(ShowTracer(startPoint, endPoint));
@@ -162,16 +177,13 @@ public class Gun : MonoBehaviour
         Tracer.SetPosition(1, end);
 
         yield return new WaitForSeconds(0.05f);
-
         Tracer.enabled = false;
     }
 
     void Reload()
     {
-        if (isReloading)
-            return;
-
-        StartCoroutine(Reloading());
+        if (!isReloading)
+            StartCoroutine(Reloading());
     }
 
     IEnumerator Reloading()
@@ -186,14 +198,14 @@ public class Gun : MonoBehaviour
 
         currentammo = maxammo;
         isReloading = false;
+        currentSpread = baseSpread;
 
         UpdateAmmoUI();
     }
 
     void UpdateAmmoUI()
     {
-        if (ammoText == null)
-            return;
+        if (ammoText == null) return;
 
         ammoText.text = isReloading
             ? "Reloading..."
