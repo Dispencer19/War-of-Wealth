@@ -5,7 +5,18 @@ using UnityEngine;
 public class CamPos : MonoBehaviour
 {
     public Transform cameraPosition;
-    private void Update(){
-        transform.position = cameraPosition.position;
+
+    private void Update()
+    {
+        if (cameraPosition == null)
+            return;
+
+        float targetY = transform.parent != null ? transform.parent.position.y : cameraPosition.position.y;
+        if (transform.parent == null && cameraPosition.parent != null)
+            targetY = cameraPosition.parent.position.y;
+
+        Vector3 targetPos = cameraPosition.position;
+        targetPos.y = targetY;
+        transform.position = targetPos;
     }
 }

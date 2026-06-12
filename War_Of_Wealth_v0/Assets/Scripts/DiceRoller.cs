@@ -11,8 +11,11 @@ public class DiceRoller : MonoBehaviour
 
     public IEnumerator RollDice(System.Action<int> onComplete)
     {
-        int rollA = Random.Range(1, 7);
-        int rollB = Random.Range(1, 7);
+        //int rollA = Random.Range(1, 7);
+        //int rollB = Random.Range(1, 7);
+
+        int rollA = 4;
+        int rollB = 4;
 
         // Animate both dice
         Tween t1 = diceA.Roll(rollA);
