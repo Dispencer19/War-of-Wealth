@@ -5003,11 +5003,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8385836491182413749, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
---- !u!1 &488097997 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5096507742717803388, guid: 4de24033e2961e5478bc0bf46acd280b, type: 3}
-  m_PrefabInstance: {fileID: 4568313392657937321}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &495332193 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -213666939420765540, guid: 31e4e75f0a3c92c4fa7e0338cc90a310, type: 3}
@@ -9440,7 +9435,6 @@ MonoBehaviour:
   boardTurns: {fileID: 1614921049}
   gameMode: {fileID: 1110892755}
   FPSCanvas: {fileID: 53567766}
-  playerPrefab: {fileID: 1232265125}
   player1FightSpawn: {fileID: 336280794}
   player2FightSpawn: {fileID: 1569494156}
   fightUI: {fileID: 1017590411}
@@ -10287,11 +10281,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1227265732}
   m_CullTransparentMesh: 1
---- !u!1 &1232265125 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -8056189271933156418, guid: 95923c15ea39f0349a22cd5beba898d4, type: 3}
-  m_PrefabInstance: {fileID: 336280793}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1237527797
 GameObject:
   m_ObjectHideFlags: 0
@@ -13560,6 +13549,7 @@ GameObject:
   - component: {fileID: 1614921050}
   - component: {fileID: 1614921053}
   - component: {fileID: 1614921054}
+  - component: {fileID: 1614921055}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -13580,7 +13570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardTurns
   boardVariables: {fileID: 1614921054}
-  tileEffects: {fileID: 0}
+  tileEffects: {fileID: 1614921053}
   currentPlayerStats: {fileID: 2083885994}
   diceRollResultText: {fileID: 1257730318}
   currentplayerMoney: {fileID: 2028565674}
@@ -14888,8 +14878,8 @@ MonoBehaviour:
   InJailUI: {fileID: 131337531}
   boardTurns: {fileID: 1614921049}
   AimChallengeUI: {fileID: 577634831}
-  fightTeleport: {fileID: 0}
-  chanceCard: {fileID: 0}
+  fightTeleport: {fileID: 1614921055}
+  chanceCard: {fileID: 1361222436}
   battleIntroSeconds: 1.5
 --- !u!114 &1614921054
 MonoBehaviour:
@@ -14945,6 +14935,23 @@ MonoBehaviour:
   - {fileID: 1152696204}
   - {fileID: 1578745615}
   - {fileID: 73533697}
+--- !u!114 &1614921055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614921048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 166394aab28db49139468a922bf5e6ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FightTeleport
+  player1Index: 0
+  player2Index: 1
+  player1Spawn: {fileID: 1120632954}
+  player2Spawn: {fileID: 1182671072}
+  disableFPS: {fileID: 1110892756}
 --- !u!1 &1617940771
 GameObject:
   m_ObjectHideFlags: 0
@@ -16274,6 +16281,7 @@ GameObject:
   - component: {fileID: 1743932730}
   - component: {fileID: 1743932729}
   - component: {fileID: 1743932728}
+  - component: {fileID: 1743932731}
   m_Layer: 5
   m_Name: Collect 200
   m_TagString: Untagged
@@ -16344,7 +16352,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1743932729}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1743932731}
+        m_TargetAssemblyTypeName: PassGo, Assembly-CSharp
+        m_MethodName: Collect200
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1743932729
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16383,6 +16403,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1743932726}
   m_CullTransparentMesh: 1
+--- !u!114 &1743932731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743932726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f251c14029b817d4c96416b24b8f8b83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  boardTurns: {fileID: 1614921049}
+  passGoUI: {fileID: 1919514751}
+  endTurnUI: {fileID: 420533272}
+  passGoAmount: 200
 --- !u!1 &1750496152
 GameObject:
   m_ObjectHideFlags: 0
@@ -19272,7 +19308,6 @@ MonoBehaviour:
   boardTurns: {fileID: 1614921049}
   gameMode: {fileID: 1110892755}
   FPSCanvas: {fileID: 53567766}
-  playerPrefab: {fileID: 488097997}
   player1FightSpawn: {fileID: 1120632954}
   player2FightSpawn: {fileID: 1182671072}
   fightUI: {fileID: 577634831}

@@ -9,7 +9,6 @@ public class PayRentUI : MonoBehaviour
     public GameObject FPSCanvas;
 
     [Header("Fight Settings")]
-    public GameObject playerPrefab; // The player prefab to spawn for fights
     public Transform player1FightSpawn;
     public Transform player2FightSpawn;
 
@@ -117,37 +116,37 @@ public class PayRentUI : MonoBehaviour
 
     /// <summary>
     /// Initiates a fight between the current player and another player.
-    /// Spawns new player prefabs at the fight locations for the fight.
+    /// Moves the existing scene player objects to their fight spawn locations.
     /// </summary>
     /// <param name="opponentIndex">The index of the opponent player.</param>
     public void Fight(int opponentIndex)
     {
-        if (playerPrefab == null)
-        {
-            Debug.LogError("Player prefab not set in PayRentUI!");
-            return;
-        }
-
         int currentPlayer = boardTurns.currPlayer;
 
         // Get spawn positions based on player index
         Transform currentSpawn = currentPlayer == 0 ? player1FightSpawn : player2FightSpawn;
         Transform opponentSpawn = opponentIndex == 0 ? player1FightSpawn : player2FightSpawn;
 
-        Vector3 currentSpawnPos = currentSpawn != null ? currentSpawn.position : Vector3.zero;
-        Quaternion currentSpawnRot = currentSpawn != null ? currentSpawn.rotation : Quaternion.identity;
-        
-        Vector3 opponentSpawnPos = opponentSpawn != null ? opponentSpawn.position : Vector3.zero;
-        Quaternion opponentSpawnRot = opponentSpawn != null ? opponentSpawn.rotation : Quaternion.identity;
+        GameObject currentFightPlayer = GetPlayer(currentPlayer);
+        GameObject opponentFightPlayer = GetPlayer(opponentIndex);
 
-        // Spawn current player at their fight spawn (only if we own this player)
-        // Use the player prefab name from the prefab asset
-        GameObject currentFightPlayer = Instantiate(playerPrefab, currentSpawnPos, currentSpawnRot);
-        currentFightPlayer.name = "Player" + (currentPlayer + 1) + "_Fight";
+        if (currentFightPlayer == null || opponentFightPlayer == null)
+        {
+            Debug.LogError("Fight players not found in scene! Make sure PlayerManager has the correct player objects.");
+            return;
+        }
 
-        // Spawn opponent at their fight spawn
-        GameObject opponentFightPlayer = Instantiate(playerPrefab, opponentSpawnPos, opponentSpawnRot);
-        opponentFightPlayer.name = "Player" + (opponentIndex + 1) + "_Fight";
+        if (currentSpawn != null)
+        {
+            currentFightPlayer.transform.position = currentSpawn.position;
+            currentFightPlayer.transform.rotation = currentSpawn.rotation;
+        }
+
+        if (opponentSpawn != null)
+        {
+            opponentFightPlayer.transform.position = opponentSpawn.position;
+            opponentFightPlayer.transform.rotation = opponentSpawn.rotation;
+        }
 
         // Switch to FPS mode (all clients)
         gameMode.buttonSwitchGameMode();
@@ -158,6 +157,6 @@ public class PayRentUI : MonoBehaviour
         if (FPSCanvas != null)
             FPSCanvas.SetActive(true);
 
-        Debug.Log($"Fight started - spawned Player {currentPlayer + 1} and Player {opponentIndex + 1} at fight locations");
+        Debug.Log($"Fight started between Player {currentPlayer + 1} and Player {opponentIndex + 1}");
     }
 }
